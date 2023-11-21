@@ -59,13 +59,17 @@ public class ExampleMod {
 
         System.out.println("Unbreaking");
         System.out.println("Efficiency");
+        ModStats.CustomStats.UNBREAKING.addToPlayer(player, 1);
+        ModStats.CustomStats.EFFICIENCY.addToPlayer(player, 1);
 
         if (event.getState().is(net.minecraftforge.common.Tags.Blocks.ORES)) {
             System.out.println("Fortune");
+            ModStats.CustomStats.FORTUNE.addToPlayer(player, 1);
         }
 
         if (player.isInWater()) {
             System.out.println("Aqua affinity");
+            ModStats.CustomStats.AQUA_AFFINITY.addToPlayer(player, 1);
         }
 
     }
@@ -75,6 +79,7 @@ public class ExampleMod {
         Player attacker = event.getEntity();
         if (attacker.isHolding(itemStack -> itemStack.getItem() instanceof SwordItem)) {
             attacker.sendSystemMessage(Component.literal("Sweeping Edge : " + event.getDamageModifier()));
+            ModStats.CustomStats.SWEEPING_EDGE.addToPlayer(attacker, 1);
         }
     }
 
@@ -84,6 +89,7 @@ public class ExampleMod {
 
         if (entity instanceof Player player) {
             System.out.println("Protection");
+            ModStats.CustomStats.PROTECTION.addToPlayer(player, 1);
         }
     }
 
@@ -93,6 +99,7 @@ public class ExampleMod {
         if (source.is(DamageTypes.PLAYER_ATTACK)
                 && player.isHolding(itemStack -> itemStack.getItem() instanceof SwordItem)) {
             player.sendSystemMessage(Component.literal("Sharpness"));
+            ModStats.CustomStats.SHARPNESS.addToPlayer(player, 1);
         } else if (source.is(DamageTypes.ARROW)) {
             Arrow arrow = (Arrow) source.getDirectEntity();
             if (arrow.isOnFire()) {
@@ -107,6 +114,7 @@ public class ExampleMod {
         long now = System.currentTimeMillis();
         if (entityGiven != null && entityGiven.entity == victim && now - entityGiven.timestamp < 3000) {
             player.sendSystemMessage(Component.literal("Multishot"));
+            ModStats.CustomStats.MULTISHOT.addToPlayer(player, 1);
             removeGivenDamage(player);
         }
 
@@ -116,6 +124,7 @@ public class ExampleMod {
             for (EntityWithTimestamp entity : entities) {
                 if (entity.entity == victim) {
                     player.sendSystemMessage(Component.literal("Thorns"));
+                    ModStats.CustomStats.THORNS.addToPlayer(player, 1);
                     removeDamage(player, victim);
                 }
             }
@@ -138,19 +147,19 @@ public class ExampleMod {
             }
         }
         // Fire protection
-        System.out.println(source.is(DamageTypes.IN_FIRE));
-        // Blast protection
-        System.out.println(source.is(DamageTypes.EXPLOSION));
-        System.out.println(source.is(DamageTypes.PLAYER_EXPLOSION));
-        // Projectile protection
-        System.out.println(source.is(DamageTypes.MOB_PROJECTILE));
+        if (source.is(DamageTypes.IN_FIRE)) {
+            ModStats.CustomStats.FIRE_PROTECTION.addToPlayer(player, 1);
+        } else if (source.is(DamageTypes.EXPLOSION) || source.is(DamageTypes.PLAYER_EXPLOSION)) {
+            ModStats.CustomStats.BLAST_PROTECTION.addToPlayer(player, 1);
+        } else if (source.is(DamageTypes.MOB_PROJECTILE)) {
+            ModStats.CustomStats.PROJECTILE_PROTECTION.addToPlayer(player, 1);
+        }
 
         // Feather falling
         if (event.getAmount() < player.getHealth()) {
-            System.out.println(source.is(DamageTypes.FALL));
+            ModStats.CustomStats.FEATHER_FALLING.addToPlayer(player, 1);
         }
 
-        player.sendSystemMessage(Component.literal("Damage!"));
     }
 
     @SubscribeEvent
@@ -172,8 +181,8 @@ public class ExampleMod {
             return;
         }
 
+        // neither the source nor the target is a player
         if (!(event.getEntity() instanceof Player)) {
-            // neither the source nor the target is a player
             return;
         }
         onDamageTaken((Player) event.getEntity(), event);
@@ -192,14 +201,16 @@ public class ExampleMod {
 
                 if (source.is(DamageTypes.FALL)) {
                     attacker.sendSystemMessage(Component.literal("Knockback"));
+                    ModStats.CustomStats.KNOCKBACK.addToPlayer(attacker, 1);
                 } else if (source.is(DamageTypes.IN_FIRE) || source.is(DamageTypes.ON_FIRE)) {
-                    // attacker.awardStat(ModStats.FIRE_ASPECT);
                     ModStats.CustomStats.FIRE_ASPECT.addToPlayer(attacker, 1);
                     attacker.sendSystemMessage(Component.literal("Fire Aspect"));
                 } else if (source.is(DamageTypes.TRIDENT)) {
                     attacker.sendSystemMessage(Component.literal("Loyalty"));
+                    ModStats.CustomStats.LOYALTY.addToPlayer(attacker, 1);
                 } else if (source.is(DamageTypes.ARROW)) {
                     attacker.sendSystemMessage(Component.literal("Power"));
+                    ModStats.CustomStats.POWER.addToPlayer(attacker, 1);
                 }
             }
 
@@ -272,15 +283,19 @@ public class ExampleMod {
 
             if (player.isInWater()) {
                 player.sendSystemMessage(Component.literal("Respiration"));
+                ModStats.CustomStats.RESPIRATION.addToPlayer(player, 1);
 
                 if (player.isSwimming() && player.hasEffect(MobEffects.DOLPHINS_GRACE)) {
                     player.sendSystemMessage(Component.literal("Depth Strider"));
+                    ModStats.CustomStats.DEPTH_STRIDER.addToPlayer(player, 1);
                 }
             } else if (player.isSprinting()) {
                 if (player.getFeetBlockState().is(Blocks.SOUL_SAND)) {
                     player.sendSystemMessage(Component.literal("Soul Speed"));
+                    ModStats.CustomStats.SOUL_SPEED.addToPlayer(player, 1);
                 } else if (player.getFeetBlockState().is(Blocks.ICE)) {
                     player.sendSystemMessage(Component.literal("Frost Walker"));
+                    ModStats.CustomStats.FROST_WALKER.addToPlayer(player, 1);
                 }
             }
         }

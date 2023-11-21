@@ -22,15 +22,43 @@ public class ModStats {
     }
 
     public enum CustomStats {
-        AQUA_AFFINITY("aqua_affinity"), UNBREAKING("unbreaking"),
-        EFFICIENCY("efficiency"), FORTUNE("fortune"),
-        SWEEPING_EDGE("sweeping_edge"), PROTECTION("protection"),
-        MULTISHOT("multishot"), THORNS("thorns"),
-        FLAME("flame"), KNOCKBACK("knockback"), FIRE_ASPECT("fire_aspect"),
-        LOYALTY("loyalty"), POWER("power"),
-        RESPIRATION("respiration"), DEPTH_STRIDER("depth_strider"),
-        SOUL_SPEED("soul_speed"),
-        FROST_WALKER("frost_walker");
+            UNBREAKING("unbreaking"),
+        MENDING("mending"),
+            PROTECTION("protection"),
+            FIRE_PROTECTION("fire_protection"),
+            BLAST_PROTECTION("blast_protection"),
+            PROJECTILE_PROTECTION("projectile_protection"),
+            THORNS("thorns"),
+            RESPIRATION("respiration"),
+            AQUA_AFFINITY("aqua_affinity"),
+            FEATHER_FALLING("feather_falling"),
+            DEPTH_STRIDER("depth_strider"),
+            FROST_WALKER("frost_walker"),
+            SOUL_SPEED("soul_speed"),
+        // SWIFT_SNEAK("swift_sneak"),
+            SHARPNESS("sharpness"),
+        // SMITE("smite"),
+        // BANE_OF_ARTHROPODS("bane_of_arthropods"),
+            KNOCKBACK("knockback"),
+            FIRE_ASPECT("fire_aspect"),
+        // LOOTING("looting"),
+            SWEEPING_EDGE("sweeping_edge"),
+            EFFICIENCY("efficiency"),
+        SILK_TOUCH("silk_touch"),
+            FORTUNE("fortune"),
+        CHANNELING("channeling"),
+            LOYALTY("loyalty"),
+        // RIPTIDE("riptide"),
+        // IMPALING("impaling"),
+            POWER("power"),
+        PUNCH("punch"),
+            MULTISHOT("multishot"),
+        PIERCING("piercing"),
+        // QUICK_CHARGE("quick_charge"),
+            FLAME("flame");
+        // INFINITY("infinity"),
+        // LUCK_OF_THE_SEA("luck_of_the_sea"),
+        // LURE("lure");
 
         private final ResourceLocation registryName;
 
