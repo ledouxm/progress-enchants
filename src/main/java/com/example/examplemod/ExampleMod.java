@@ -42,7 +42,6 @@ public class ExampleMod {
     public static final String MODID = "examplemod";
 
     private static final HashMap<Player, List<EntityWithTimestamp>> lastDamageTaken = new HashMap<>();
-    private static final HashMap<Player, EntityWithTimestamp> lastDamageGiven = new HashMap<>();
 
     public ExampleMod() {
         MinecraftForge.EVENT_BUS.register(this);
@@ -107,15 +106,6 @@ public class ExampleMod {
                 ModStats.CustomStats.FLAME.addToPlayer(player, 1);
                 // player.awardStat(ModStats.CustomStats.FLAME);
             }
-        }
-
-        // check if the player has dealt damage to victim in the last 3 seconds
-        EntityWithTimestamp entityGiven = lastDamageGiven.get(player);
-        long now = System.currentTimeMillis();
-        if (entityGiven != null && entityGiven.entity == victim && now - entityGiven.timestamp < 3000) {
-            player.sendSystemMessage(Component.literal("Multishot"));
-            ModStats.CustomStats.MULTISHOT.addToPlayer(player, 1);
-            removeGivenDamage(player);
         }
 
         // check if the player has taken damage from victim in the last 3 seconds
@@ -209,8 +199,15 @@ public class ExampleMod {
                     attacker.sendSystemMessage(Component.literal("Loyalty"));
                     ModStats.CustomStats.LOYALTY.addToPlayer(attacker, 1);
                 } else if (source.is(DamageTypes.ARROW)) {
-                    attacker.sendSystemMessage(Component.literal("Power"));
-                    ModStats.CustomStats.POWER.addToPlayer(attacker, 1);
+                    Arrow arrow = (Arrow) source.getDirectEntity();
+                    if (arrow.shotFromCrossbow()) {
+                        attacker.sendSystemMessage(Component.literal("Power"));
+                        ModStats.CustomStats.POWER.addToPlayer(attacker, 1);
+                    } else {
+                        attacker.sendSystemMessage(Component.literal("Piercing"));
+                        ModStats.CustomStats.PIERCING.addToPlayer(attacker, 1);
+                    }
+
                 }
             }
 
@@ -312,14 +309,6 @@ public class ExampleMod {
         long now = System.currentTimeMillis();
         List<EntityWithTimestamp> entities = lastDamageTaken.get(player);
         entities.removeIf((entity) -> now - entity.timestamp > 3000);
-    }
-
-    public void removeGivenDamage(Player player) {
-        lastDamageGiven.remove(player);
-    }
-
-    public void addGivenDamage(Player player, LivingEntity entity) {
-        lastDamageGiven.put(player, new EntityWithTimestamp(entity));
     }
 
     public void removeDamage(Player player, LivingEntity entity) {
