@@ -23,12 +23,11 @@ public class EnchantingBenchEntity extends BlockEntity implements MenuProvider {
 
     public void enchantItem(ItemStack item, PossibleEnchantment enchantment) {
         item.enchant(enchantment.enchantment, enchantment.level);
-        item.
     }
 
     @Override
     public AbstractContainerMenu createMenu(int p_39954_, Inventory p_39955_, Player p_39956_) {
-        return new EnchantingBenchMenu(p_39954_, p_39955_, this, null);
+        return new EnchantingBenchMenu(p_39954_, p_39955_, this);
     }
 
     @Override

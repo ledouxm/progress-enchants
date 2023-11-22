@@ -137,7 +137,7 @@ public class EnchantingBenchScreen extends AbstractContainerScreen<EnchantingBen
                 && mouseY <= sliderY + SLIDER_HEIGHT) {
             System.out.println("Mouse clicked on slider");
             this.isDragging = true;
-            return true;
+            return super.mouseClicked(mouseX, mouseY, clickType);
         }
 
         // check if clicked on an enchantment
@@ -146,17 +146,20 @@ public class EnchantingBenchScreen extends AbstractContainerScreen<EnchantingBen
             return super.mouseClicked(mouseX, mouseY, clickType);
         }
 
-        int enchantIndex = (int) Math.floor((mouseY - topPos - PANEL_Y + scrollOffset) / ITEM_HEIGHT);
-        System.out.println("enchantIndex: " + enchantIndex);
+        int enchantmentIndex = (int) Math.floor((mouseY - topPos - PANEL_Y + scrollOffset) / ITEM_HEIGHT);
+        System.out.println("enchantIndex: " + enchantmentIndex);
 
-        if (enchantIndex < startEnchantIndex || enchantIndex >= endEnchantIndex) {
+        if (enchantmentIndex < startEnchantIndex || enchantmentIndex >= endEnchantIndex) {
             return super.mouseClicked(mouseX, mouseY, clickType);
         }
 
-        PossibleEnchantment enchantment = this.possibleEnchantments.get(enchantIndex);
-        this.menu.enchantItem(enchantment);
+        if (this.menu.clickMenuButton(null, enchantmentIndex)) {
+            this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, enchantmentIndex);
+            return true;
 
-        return super.mouseClicked(mouseX, mouseY, clickType);
+        }
+
+        return super.mouseClicked(mouseY, clickType, enchantmentIndex);
     }
 
     @Override

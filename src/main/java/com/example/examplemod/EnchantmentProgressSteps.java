@@ -146,13 +146,13 @@ public class EnchantmentProgressSteps {
         boolean isBook = item == Items.BOOK || item == Items.ENCHANTED_BOOK;
 
         for (Enchantment enchantment : EnchantmentProgressSteps.steps.keySet()) {
-            if (isBook || enchantment.canEnchant(itemStack)) {
+            if ((isBook && enchantment.isAllowedOnBooks()) || enchantment.canEnchant(itemStack)) {
                 possibleEnchantments.add(enchantment);
             }
         }
 
         for (Enchantment enchantment : EnchantmentProgressSteps.bonusEnchantments) {
-            if (isBook || enchantment.canEnchant(itemStack)) {
+            if ((isBook && enchantment.isAllowedOnBooks()) || enchantment.canEnchant(itemStack)) {
                 possibleEnchantments.add(enchantment);
             }
         }

@@ -15,9 +15,6 @@ public class ModMenus {
 
         public static final RegistryObject<MenuType<EnchantingBenchMenu>> ENCHANTING_BENCH_MENU = MENUS.register(
                         "enchanting_bench_menu",
-                        () -> IForgeMenuType.create(
-                                        (containerId, playerInventory, additionalData) -> new EnchantingBenchMenu(
-                                                        containerId,
-                                                        playerInventory, additionalData)));
+                        () -> IForgeMenuType.create(EnchantingBenchMenu::new));
 
 }
