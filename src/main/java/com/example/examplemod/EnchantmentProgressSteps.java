@@ -10,6 +10,7 @@ import com.example.examplemod.init.ModStats.CustomStats;
 import net.minecraft.client.multiplayer.chat.LoggedChatMessage.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 
@@ -48,7 +49,7 @@ public class EnchantmentProgressSteps {
         steps.put(Enchantments.FIRE_ASPECT, new int[] { 5, 50 });
         steps.put(Enchantments.MOB_LOOTING, new int[] { 40, 100, 300 });
         steps.put(Enchantments.SWEEPING_EDGE, new int[] { 20, 50, 150 });
-        steps.put(Enchantments.BLOCK_FORTUNE, new int[] { 100, 500, 1000, 3000, 6000 });
+        steps.put(Enchantments.BLOCK_EFFICIENCY, new int[] { 10, 20, 1000, 3000, 6000 });
         steps.put(Enchantments.BLOCK_FORTUNE, new int[] { 150, 400, 800 });
         steps.put(Enchantments.LOYALTY, new int[] { 5, 20, 60 });
         steps.put(Enchantments.RIPTIDE, new int[] { 10, 50, 120 });
@@ -60,14 +61,36 @@ public class EnchantmentProgressSteps {
         steps.put(Enchantments.FLAMING_ARROWS, new int[] { 32 });
         steps.put(Enchantments.FISHING_LUCK, new int[] { 1, 3, 6 });
         steps.put(Enchantments.FISHING_SPEED, new int[] { 5, 15, 30 });
+    }
 
+    public static int getCost(Enchantment enchantment, int level) {
+        int[] steps = EnchantmentProgressSteps.steps.get(enchantment);
+
+        if (steps == null) {
+            return 20;
+        }
+
+        switch (steps.length) {
+            case 1:
+                return 20;
+            case 2:
+                return level * 10;
+            case 3:
+                return level * 6;
+            case 4:
+                return level * 5;
+            case 5:
+                return level * 4;
+        }
+
+        return -1;
     }
 
     public static boolean isBonus(Enchantment enchantment) {
         return bonusEnchantments.contains(enchantment);
     }
 
-    public static int getProgress(Enchantment enchantment, int amount) {
+    public static int getLevel(Enchantment enchantment, int score) {
         int[] steps = EnchantmentProgressSteps.steps.get(enchantment);
 
         if (steps == null) {
@@ -76,7 +99,7 @@ public class EnchantmentProgressSteps {
 
         int progress = 0;
         for (int i = 0; i < steps.length; i++) {
-            if (amount >= steps[i]) {
+            if (score >= steps[i]) {
                 progress = i + 1;
             }
         }
@@ -84,33 +107,52 @@ public class EnchantmentProgressSteps {
         return progress;
     }
 
+    public static int getNextLevelScore(Enchantment enchantment, int currentLevel) {
+        int[] steps = EnchantmentProgressSteps.steps.get(enchantment);
+
+        if (steps == null) {
+            return 0;
+        }
+
+        if (currentLevel >= steps.length || currentLevel < 0) {
+            return -1;
+        }
+
+        return steps[currentLevel];
+    }
+
+    public static int getCurrentLevelScore(Enchantment enchantment, int currentLevel) {
+        int[] steps = EnchantmentProgressSteps.steps.get(enchantment);
+
+        if (steps == null) {
+            return 0;
+        }
+
+        if (currentLevel == 0) {
+            return 0;
+        }
+
+        return steps[currentLevel - 1];
+    }
+
     public static boolean canEnchant(ItemStack itemStack) {
-        for (Enchantment enchantment : EnchantmentProgressSteps.steps.keySet()) {
-            if (enchantment.canEnchant(itemStack)) {
-                return true;
-            }
-        }
-
-        for (Enchantment enchantment : EnchantmentProgressSteps.bonusEnchantments) {
-            if (enchantment.canEnchant(itemStack)) {
-                return true;
-            }
-        }
-
-        return false;
+        return getPossibleEnchantmentsForItem(itemStack).size() > 0;
     }
 
     public static List<Enchantment> getPossibleEnchantmentsForItem(ItemStack itemStack) {
         List<Enchantment> possibleEnchantments = new ArrayList<Enchantment>();
 
+        Item item = itemStack.getItem();
+        boolean isBook = item == Items.BOOK || item == Items.ENCHANTED_BOOK;
+
         for (Enchantment enchantment : EnchantmentProgressSteps.steps.keySet()) {
-            if (enchantment.canEnchant(itemStack)) {
+            if (isBook || enchantment.canEnchant(itemStack)) {
                 possibleEnchantments.add(enchantment);
             }
         }
 
         for (Enchantment enchantment : EnchantmentProgressSteps.bonusEnchantments) {
-            if (enchantment.canEnchant(itemStack)) {
+            if (isBook || enchantment.canEnchant(itemStack)) {
                 possibleEnchantments.add(enchantment);
             }
         }

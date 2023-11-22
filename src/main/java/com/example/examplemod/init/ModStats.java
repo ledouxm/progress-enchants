@@ -5,6 +5,8 @@ import com.example.examplemod.ExampleMod;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.stats.ServerStatsCounter;
 import net.minecraft.stats.StatFormatter;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.player.Player;
@@ -25,7 +27,7 @@ public class ModStats {
 
     public enum CustomStats {
         UNBREAKING("unbreaking"),
-        MENDING("mending"),
+        // MENDING("mending"),
         PROTECTION("protection"),
         FIRE_PROTECTION("fire_protection"),
         BLAST_PROTECTION("blast_protection"),
@@ -46,15 +48,15 @@ public class ModStats {
         // LOOTING("looting"),
         SWEEPING_EDGE("sweeping_edge"),
         EFFICIENCY("efficiency"),
-        SILK_TOUCH("silk_touch"),
+        // SILK_TOUCH("silk_touch"),
         FORTUNE("fortune"),
-        CHANNELING("channeling"),
+        // CHANNELING("channeling"),
         LOYALTY("loyalty"),
         // RIPTIDE("riptide"),
         // IMPALING("impaling"),
-        POWER("power"),
+        // POWER("power"),
         PUNCH("punch"),
-        MULTISHOT("multishot"),
+        // MULTISHOT("multishot"),
         PIERCING("piercing"),
         // QUICK_CHARGE("quick_charge"),
         FLAME("flame");
@@ -70,6 +72,17 @@ public class ModStats {
 
         public void addToPlayer(Player player, int amount) {
             player.awardStat(this.registryName, amount);
+        }
+
+        public int getAmount(Player player) {
+            if (!(player instanceof ServerPlayer serverPlayer)) {
+                return 0;
+            }
+            return serverPlayer.getStats().getValue(Stats.CUSTOM.get(this.registryName));
+        }
+
+        public int getAmount(ServerStatsCounter stats) {
+            return stats.getValue(Stats.CUSTOM.get(this.registryName));
         }
 
         public ResourceLocation getRegistryName() {

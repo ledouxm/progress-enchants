@@ -2,6 +2,8 @@ package com.example.examplemod.block;
 
 import org.jetbrains.annotations.NotNull;
 
+import com.example.examplemod.EnchantmentProgressManager;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -62,6 +64,7 @@ public class EnchantingBenchBlock extends BaseEntityBlock {
         }
 
         if (player instanceof ServerPlayer serverPlayer) {
+            EnchantmentProgressManager.get(player.getServer()).sendDataToPlayer(serverPlayer);
             NetworkHooks.openScreen(serverPlayer, state.getMenuProvider(level, pos),
                     pos);
         }

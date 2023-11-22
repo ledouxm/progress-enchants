@@ -27,6 +27,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.SwordItem;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
@@ -77,6 +78,17 @@ public class ExampleMod {
         System.out.println("Efficiency");
         ModStats.CustomStats.UNBREAKING.addToPlayer(player, 1);
         ModStats.CustomStats.EFFICIENCY.addToPlayer(player, 1);
+
+        int unbreakingAmount = ModStats.CustomStats.UNBREAKING.getAmount(player);
+        int efficiencyAmount = ModStats.CustomStats.EFFICIENCY.getAmount(player);
+
+        System.out.println("Unbreaking amount : " + unbreakingAmount);
+        System.out.println("Efficiency amount : " + efficiencyAmount);
+
+        EnchantmentProgressManager.get(player.getServer()).checkPlayerProgress(player, Enchantments.UNBREAKING,
+                unbreakingAmount);
+        EnchantmentProgressManager.get(player.getServer()).checkPlayerProgress(player, Enchantments.BLOCK_EFFICIENCY,
+                efficiencyAmount);
 
         if (event.getState().is(net.minecraftforge.common.Tags.Blocks.ORES)) {
             System.out.println("Fortune");
@@ -218,8 +230,8 @@ public class ExampleMod {
                 } else if (source.is(DamageTypes.ARROW)) {
                     Arrow arrow = (Arrow) source.getDirectEntity();
                     if (arrow.shotFromCrossbow()) {
-                        attacker.sendSystemMessage(Component.literal("Power"));
-                        ModStats.CustomStats.POWER.addToPlayer(attacker, 1);
+                        attacker.sendSystemMessage(Component.literal("Punch"));
+                        ModStats.CustomStats.PUNCH.addToPlayer(attacker, 1);
                     } else {
                         attacker.sendSystemMessage(Component.literal("Piercing"));
                         ModStats.CustomStats.PIERCING.addToPlayer(attacker, 1);
@@ -250,7 +262,7 @@ public class ExampleMod {
             int nbTridentsThrown = counter.getValue(Stats.ITEM_USED.get(Items.TRIDENT));
             // Quick charge
             int nbCrossbowUsed = counter.getValue(Stats.ITEM_USED.get(Items.CROSSBOW));
-            // Infinity
+            // Power
             int nbBowUsed = counter.getValue(Stats.ITEM_USED.get(Items.BOW));
 
             int nbZombieKilled = counter.getValue(Stats.ENTITY_KILLED.get(EntityType.ZOMBIE));
@@ -309,7 +321,9 @@ public class ExampleMod {
                     ModStats.CustomStats.SOUL_SPEED.addToPlayer(player, 1);
                 } else if (player.getFeetBlockState().is(Blocks.ICE)) {
                     player.sendSystemMessage(Component.literal("Frost Walker"));
-                    ModStats.CustomStats.FROST_WALKER.addToPlayer(player, 1);
+                    // ModStats.CustomStats.FROST_WALKER.addToPlayer(player, 1);
+                    EnchantmentProgressManager.get(player.getServer()).unlockEnchantment(Enchantments.FROST_WALKER, 1,
+                            player);
                 }
             }
         }
