@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.example.examplemod.ModStats;
+import com.example.examplemod.init.ModStats;
 
 import net.minecraft.server.Bootstrap;
 

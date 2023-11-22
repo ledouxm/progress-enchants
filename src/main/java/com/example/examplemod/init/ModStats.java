@@ -1,4 +1,6 @@
-package com.example.examplemod;
+package com.example.examplemod.init;
+
+import com.example.examplemod.ExampleMod;
 
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;

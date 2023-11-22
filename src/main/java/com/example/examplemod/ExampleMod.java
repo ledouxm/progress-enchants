@@ -5,6 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.examplemod.init.ModBlockEntities;
+import com.example.examplemod.init.ModBlocks;
+import com.example.examplemod.init.ModCreativeTabs;
+import com.example.examplemod.init.ModItems;
+import com.example.examplemod.init.ModMenus;
+import com.example.examplemod.init.ModStats;
+import com.google.common.eventbus.EventBus;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.ServerStatsCounter;
@@ -28,6 +36,7 @@ import net.minecraftforge.event.entity.living.ShieldBlockEvent;
 import net.minecraftforge.event.entity.player.CriticalHitEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
@@ -47,7 +56,15 @@ public class ExampleMod {
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(CustomEventHandler.class);
 
-        FMLJavaModLoadingContext.get().getModEventBus().register(ModStats.class);
+        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+
+        modEventBus.register(ModStats.class);
+
+        ModBlocks.BLOCKS.register(modEventBus);
+        ModBlockEntities.BLOCK_ENTITIES.register(modEventBus);
+        ModItems.ITEMS.register(modEventBus);
+        ModMenus.MENUS.register(modEventBus);
+        ModCreativeTabs.TABS.register(modEventBus);
     }
 
     @SubscribeEvent
