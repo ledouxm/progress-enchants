@@ -24,6 +24,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -34,10 +35,17 @@ public class EnchantingBenchMenu extends AbstractContainerMenu {
     private final ContainerLevelAccess levelAccess;
     public static final int ENCHANTING_SLOT = 36;
     private final Container enchantSlot = new SimpleContainer(1) {
+        @Override
         public void setChanged() {
             super.setChanged();
             EnchantingBenchMenu.this.onItemChange(this.getItem(0), EnchantingBenchMenu.this.player);
         }
+
+        @Override
+        public boolean canPlaceItem(int slot, ItemStack item) {
+            return EnchantmentProgressSteps.canEnchant(item);
+
+        };
     };
 
     private List<PossibleEnchantment> possibleEnchantments = new ArrayList<>();
@@ -122,13 +130,19 @@ public class EnchantingBenchMenu extends AbstractContainerMenu {
         if (item.isEmpty())
             return false;
 
-        if (!item.canApplyAtEnchantingTable(enchantment.enchantment)) {
+        boolean isBook = item.getItem() == Items.BOOK;
+
+        if (!item.canApplyAtEnchantingTable(enchantment.enchantment)
+                && !(isBook && enchantment.enchantment.isAllowedOnBooks())) {
+            LOGGER.info("Item cannot be enchanted with " + enchantment.enchantment);
             return false;
         }
 
         for (Map.Entry<Enchantment, Integer> entry : EnchantmentHelper.getEnchantments(item).entrySet()) {
             Enchantment currentEnchantment = entry.getKey();
             if (!currentEnchantment.isCompatibleWith(enchantment.enchantment)) {
+                LOGGER.info("Item cannot be enchanted with " + enchantment.enchantment
+                        + " because it is not compatible with " + currentEnchantment);
                 return false;
             }
         }

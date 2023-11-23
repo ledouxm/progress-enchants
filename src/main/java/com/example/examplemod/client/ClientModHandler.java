@@ -1,11 +1,16 @@
 package com.example.examplemod.client;
 
 import com.example.examplemod.ExampleMod;
+import com.example.examplemod.block.EnchantingBenchRenderer;
 import com.example.examplemod.block.EnchantingBenchScreen;
+import com.example.examplemod.init.ModBlockEntities;
+import com.example.examplemod.init.ModBlocks;
 import com.example.examplemod.init.ModMenus;
 
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -16,6 +21,8 @@ public class ClientModHandler {
     public static void clientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
             MenuScreens.register(ModMenus.ENCHANTING_BENCH_MENU.get(), EnchantingBenchScreen::new);
+            BlockEntityRenderers.register(ModBlockEntities.ENCHANTING_BENCH_ENTITY.get(), EnchantingBenchRenderer::new);
         });
     }
+
 }

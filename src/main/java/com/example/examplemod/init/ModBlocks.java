@@ -18,19 +18,11 @@ public class ModBlocks {
                         ExampleMod.MODID);
 
         public static final RegistryObject<Block> ENCHANTING_BENCH = registerBlock("enchanting_bench",
-                        () -> new EnchantingBenchBlock(BlockBehaviour.Properties.copy(Blocks.BARREL).strength(1)));
+                        () -> new EnchantingBenchBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).strength(1)));
 
         public static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
                 RegistryObject<T> toReturn = BLOCKS.register(name, block);
                 // registerBlockItem(name, toReturn);
                 return toReturn;
         }
-
-        // private static <T extends Block> void registerBlockItem(String name,
-        // RegistryObject<T> block) {
-        // ModCreativeTabs.addToTab(ModItems.ITEMS.register(name, () -> new
-        // BlockItem(block.get(),
-        // new Item.Properties())));
-        // }
-
 }

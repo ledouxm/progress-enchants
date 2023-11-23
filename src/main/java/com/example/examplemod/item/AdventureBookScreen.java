@@ -96,6 +96,8 @@ public class AdventureBookScreen extends Screen {
 
     private int size;
 
+    private Map<Enchantment, Integer> playerData;
+
     public AdventureBookScreen(Player player) {
         super(Component.translatable("gui.examplemod.adventure_book.title"));
         this.player = player;
@@ -193,6 +195,7 @@ public class AdventureBookScreen extends Screen {
             return;
         this.progress = EnchantmentProgressManager.get(null).getProgress(player);
         this.bonusEnchantments = EnchantmentProgressSteps.getBonusEnchantmentsAvailability(player);
+        this.playerData = EnchantmentProgressManager.get(null).getPlayerData(player);
         updatePagination();
     }
 
@@ -231,9 +234,11 @@ public class AdventureBookScreen extends Screen {
     }
 
     public void renderItemName(@NotNull GuiGraphics graphics, int y, Enchantment enchantment) {
-        String descriptionId = enchantment.getDescriptionId();
+        int currentLevel = playerData.getOrDefault(enchantment, 0);
+        MutableComponent text = currentLevel == 0 ? Component.translatable(enchantment.getDescriptionId())
+                : (MutableComponent) enchantment.getFullname(currentLevel);
         drawString(graphics, font,
-                ((MutableComponent) Component.translatable(descriptionId).withStyle(ChatFormatting.BLACK)),
+                text.withStyle(ChatFormatting.BLACK),
                 leftPos + WRITABLE_OFFSET_X, y, 8.0D, 0x000000,
                 false);
 
@@ -265,7 +270,7 @@ public class AdventureBookScreen extends Screen {
         List<Enchantment> requirements = EnchantmentUtils.getRequirementsForBonusEnchantment(enchantment);
 
         MutableComponent text = Component.empty();
-        Component delimiter = Component.literal(" ");
+        Component delimiter = Component.literal(", ");
 
         for (int i = 0; i < requirements.size(); i++) {
             Enchantment requiredEnchantment = requirements.get(i);
