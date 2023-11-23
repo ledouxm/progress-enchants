@@ -1,20 +1,16 @@
 package com.example.examplemod;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-
 import java.util.UUID;
 import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
 import com.example.examplemod.block.PossibleEnchantment;
-import com.example.examplemod.init.ModStats;
-import com.example.examplemod.init.ModStats.CustomStats;
 import com.example.examplemod.network.EnchantmentProgressChannel;
 import com.example.examplemod.network.EnchantmentProgressClientboundPacket;
 
@@ -24,9 +20,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.ServerStatsCounter;
-import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
@@ -40,30 +34,23 @@ public class EnchantmentProgressManager extends SavedData {
     private final Map<UUID, Map<Enchantment, Integer>> bonusClaimed = new HashMap<>();
     private final Map<UUID, List<EnchantmentProgressSnapshot>> snapshots = new HashMap<>();
 
-    public static EnchantmentProgressManager create() {
-        return new EnchantmentProgressManager();
-    }
-
-    public static EnchantmentProgressManager read(CompoundTag tag) {
-        EnchantmentProgressManager data = create();
-
-        return data;
-    }
-
     public Map<Enchantment, Integer> getPlayerData(Player player) {
         return data.get(player.getUUID());
     }
 
     public void setPlayerData(UUID player, Map<Enchantment, Integer> playerData) {
         data.put(player, playerData);
+        this.setDirty();
     }
 
     public void setBonusClaimed(UUID player, Map<Enchantment, Integer> bonusClaimed) {
         this.bonusClaimed.put(player, bonusClaimed);
+        this.setDirty();
     }
 
     public void setProgress(UUID player, List<EnchantmentProgressSnapshot> snapshots) {
         this.snapshots.put(player, snapshots);
+        this.setDirty();
     }
 
     public EnchantmentProgressSnapshot getEnchantmentProgressSnapshotForPlayer(Player player, Enchantment enchantment,
@@ -127,6 +114,7 @@ public class EnchantmentProgressManager extends SavedData {
         if (playerData == null) {
             playerData = new HashMap<>();
             data.put(uuid, playerData);
+            this.setDirty();
         }
 
         if (EnchantmentProgressSteps.isBonus(enchantment)) {
@@ -189,6 +177,8 @@ public class EnchantmentProgressManager extends SavedData {
         }
 
         playerBonusClaimed.put(enchantment, level);
+
+        this.setDirty();
     }
 
     public void unlockEnchantment(Enchantment enchantment, int level, Player player) {
@@ -204,6 +194,7 @@ public class EnchantmentProgressManager extends SavedData {
     public void unlockEnchantment(Enchantment enchantment, int level, Map<Enchantment, Integer> playerData) {
         System.out.println("Unlocking enchantment " + enchantment.getFullname(1) + " with level " + level);
         playerData.put(enchantment, level);
+        this.setDirty();
     }
 
     public void checkPlayerBonusProgress(Player player, Enchantment enchantment, Map<Enchantment, Integer> playerData) {
@@ -292,27 +283,60 @@ public class EnchantmentProgressManager extends SavedData {
         return true;
     }
 
-    @Override
-    public CompoundTag save(CompoundTag tag) {
-        ListTag tagList = new ListTag();
+    public ListTag getMapNBT(Map<UUID, Map<Enchantment, Integer>> data) {
+        ListTag list = new ListTag();
         for (Map.Entry<UUID, Map<Enchantment, Integer>> entry : data.entrySet()) {
-            CompoundTag playerTag = new CompoundTag();
-            playerTag.putUUID("uuid", entry.getKey());
-
-            ListTag enchantmentsTag = new ListTag();
+            CompoundTag tag = new CompoundTag();
+            tag.putUUID("player", entry.getKey());
+            ListTag enchantments = new ListTag();
             for (Map.Entry<Enchantment, Integer> enchantmentEntry : entry.getValue().entrySet()) {
-                CompoundTag enchantmentTag = new CompoundTag();
-                enchantmentTag.putString("enchantment", enchantmentEntry.getClass().getName());
-                enchantmentTag.putInt("progress", enchantmentEntry.getValue());
-                enchantmentsTag.add(enchantmentTag);
+                CompoundTag enchantmentData = new CompoundTag();
+                enchantmentData.putString("enchantment", EnchantmentUtils.getEnchantmentId(enchantmentEntry.getKey()));
+                enchantmentData.putInt("progress", enchantmentEntry.getValue());
+                enchantments.add(enchantmentData);
             }
-
-            playerTag.put("enchantments", enchantmentsTag);
-            tagList.add(playerTag);
+            tag.put("enchantments", enchantments);
+            list.add(tag);
         }
 
-        tag.put("enchantment_progress", tagList);
+        return list;
+    }
+
+    public Map<UUID, Map<Enchantment, Integer>> getMapFromNBT(ListTag list) {
+        Map<UUID, Map<Enchantment, Integer>> data = new HashMap<>();
+        for (int i = 0; i < list.size(); i++) {
+            CompoundTag tag = list.getCompound(i);
+            UUID player = tag.getUUID("player");
+            ListTag enchantments = tag.getList("enchantments", 10);
+            Map<Enchantment, Integer> playerData = new HashMap<>();
+            for (int j = 0; j < enchantments.size(); j++) {
+                CompoundTag enchantmentData = enchantments.getCompound(j);
+                Enchantment enchantment = EnchantmentUtils
+                        .getEnchantmentById(enchantmentData.getString("enchantment"));
+                int progress = enchantmentData.getInt("progress");
+                playerData.put(enchantment, progress);
+            }
+            data.put(player, playerData);
+        }
+
+        return data;
+    }
+
+    @Override
+    public CompoundTag save(CompoundTag tag) {
+        tag.put("data", getMapNBT(data));
+        tag.put("bonusClaimed", getMapNBT(bonusClaimed));
+
         return tag;
+    }
+
+    public static EnchantmentProgressManager read(CompoundTag tag) {
+        EnchantmentProgressManager manager = new EnchantmentProgressManager();
+
+        manager.data.putAll(manager.getMapFromNBT(tag.getList("data", 10)));
+        manager.bonusClaimed.putAll(manager.getMapFromNBT(tag.getList("bonusClaimed", 10)));
+
+        return manager;
     }
 
     public static EnchantmentProgressManager get(@Nullable MinecraftServer server) {
@@ -320,7 +344,7 @@ public class EnchantmentProgressManager extends SavedData {
             ServerLevel overworld = server.getLevel(Level.OVERWORLD);
 
             return Objects.requireNonNull(overworld).getDataStorage().computeIfAbsent(EnchantmentProgressManager::read,
-                    EnchantmentProgressManager::create,
+                    EnchantmentProgressManager::new,
                     "enchantment_progress");
         }
 
