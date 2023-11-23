@@ -1,6 +1,9 @@
 package com.example.examplemod.init;
 
+import java.util.function.Supplier;
+
 import com.example.examplemod.ExampleMod;
+import com.example.examplemod.item.AdventureBookItem;
 
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -14,12 +17,14 @@ public class ModItems {
                         ExampleMod.MODID);
 
         public static final RegistryObject<Item> ENCHANTING_BENCH = registerItem("enchanting_bench",
-                        new Item.Properties());
+                        () -> new BlockItem(ModBlocks.ENCHANTING_BENCH.get(), new Item.Properties()));
+
+        public static final RegistryObject<Item> ADVENTURE_BOOK = registerItem("adventure_book",
+                        () -> new AdventureBookItem(new Item.Properties()));
 
         private static <T extends Item> RegistryObject<Item> registerItem(String name,
-                        Item.Properties properties) {
-                RegistryObject<Item> item = ModItems.ITEMS.register(name,
-                                () -> new BlockItem(ModBlocks.ENCHANTING_BENCH.get(), properties));
+                        Supplier<? extends Item> supplier) {
+                RegistryObject<Item> item = ModItems.ITEMS.register(name, supplier);
                 ModCreativeTabs.addToTab(item);
                 return item;
         }

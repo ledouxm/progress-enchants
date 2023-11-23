@@ -1,28 +1,19 @@
 package com.example.examplemod.block;
 
-import java.util.Map;
 import java.util.List;
 
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
-import com.example.examplemod.ExampleMod;
 import com.example.examplemod.EnchantmentProgressManager.Status;
+import com.example.examplemod.ExampleMod;
 import com.mojang.logging.LogUtils;
-import com.example.examplemod.EnchantmentProgressManager;
-import com.example.examplemod.EnchantmentProgressSnapshot;
 
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.screens.inventory.MerchantScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.EnchantmentMenu;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.level.block.entity.EnchantmentTableBlockEntity;
 
 public class EnchantingBenchScreen extends AbstractContainerScreen<EnchantingBenchMenu> {
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -49,12 +40,13 @@ public class EnchantingBenchScreen extends AbstractContainerScreen<EnchantingBen
     private static final int XP_ORB_HEIGHT = 8;
 
     private static final int COST_OFFSET_X = 122;
-    private static final int COST_OFFSET_Y = 5;
+    private static final int COST_OFFSET_Y = 6;
 
     private static final int PROGRESS_SRC_X = 0;
     private static final int PROGRESS_COMPLETE_SRC_Y = 181;
     private static final int PROGRESS_EMPTY_SRC_Y = 186;
     private static final int PROGRESS_XP_SRC_Y = 191;
+
     private static final int PROGRESS_WIDTH = 88;
     private static final int PROGRESS_HEIGHT = 5;
 
@@ -243,10 +235,13 @@ public class EnchantingBenchScreen extends AbstractContainerScreen<EnchantingBen
         // if (enchantment.snapshot != null) {
         // this.renderProgress(graphics, startY, enchantment);
         // }
+
+        int labelColor = enchantment.canBuy ? 0xFFFFFF : 0x808080;
+
         // render item label
-        graphics.drawString(font, enchantment.enchantment.getFullname(Math.max(enchantment.level, 1)),
+        graphics.drawString(font, enchantment.enchantment.getFullname(Math.max(enchantment.level, 1)).getString(),
                 leftPos + PANEL_X + 2,
-                startY + 3, 4210752);
+                startY + 3, labelColor, false);
 
         this.renderCost(graphics, startY, enchantment);
     }
@@ -261,12 +256,13 @@ public class EnchantingBenchScreen extends AbstractContainerScreen<EnchantingBen
 
         int x = leftPos + PANEL_X + COST_OFFSET_X + (enchantment.cost < 10 ? 7 : 0);
         graphics.drawString(font, String.valueOf(enchantment.cost), x,
-                y + COST_OFFSET_Y, 4210752);
+                y + COST_OFFSET_Y, enchantment.canBuy ? enchantment.status.color : 0xba370f, false);
     }
 
     public void renderProgress(@NotNull GuiGraphics graphics, int y, PossibleEnchantment enchantment) {
         if (enchantment.snapshot.isMaxLevel()) {
             renderCompleteProgress(graphics, y, enchantment);
+            return;
         }
 
         renderProgressXp(graphics, y, enchantment);

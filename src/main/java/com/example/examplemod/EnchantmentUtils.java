@@ -1,13 +1,12 @@
 package com.example.examplemod;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import com.example.examplemod.init.ModStats.CustomStats;
 
-import java.util.HashMap;
-import java.util.function.Function;
-
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.stats.ServerStatsCounter;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.EntityType;
@@ -16,6 +15,42 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 
 public class EnchantmentUtils {
+
+    public static Map<Enchantment, List<Enchantment>> bonusEnchantmentsRequirements = new HashMap<>();
+    static {
+        bonusEnchantmentsRequirements.put(Enchantments.MENDING, List.of(Enchantments.ALL_DAMAGE_PROTECTION,
+                Enchantments.SHARPNESS, Enchantments.BLOCK_EFFICIENCY, Enchantments.POWER_ARROWS,
+                Enchantments.FISHING_LUCK));
+        bonusEnchantmentsRequirements.put(Enchantments.SILK_TOUCH,
+                List.of(Enchantments.BLOCK_FORTUNE, Enchantments.BLOCK_EFFICIENCY));
+        bonusEnchantmentsRequirements.put(Enchantments.CHANNELING,
+                List.of(Enchantments.LOYALTY, Enchantments.RIPTIDE));
+        bonusEnchantmentsRequirements.put(Enchantments.MULTISHOT,
+                List.of(Enchantments.PIERCING, Enchantments.QUICK_CHARGE));
+        bonusEnchantmentsRequirements.put(Enchantments.INFINITY_ARROWS,
+                List.of(Enchantments.PUNCH_ARROWS, Enchantments.POWER_ARROWS, Enchantments.FLAMING_ARROWS));
+    }
+
+    public static List<Enchantment> getRequirementsForBonusEnchantment(Enchantment enchantment) {
+        return bonusEnchantmentsRequirements.get(enchantment);
+    }
+
+    public static Map<Enchantment, Function<Map<Enchantment, Integer>, Boolean>> bonusEnchantmentsConditions = new HashMap<>();
+    static {
+        for (Enchantment enchantment : bonusEnchantmentsRequirements.keySet()) {
+            bonusEnchantmentsConditions.put(enchantment,
+                    enchantments -> containsAllKeys(enchantments, bonusEnchantmentsRequirements.get(enchantment)));
+        }
+    }
+
+    public static boolean containsAllKeys(Map<Enchantment, Integer> enchantments, List<Enchantment> keys) {
+        for (Enchantment key : keys) {
+            if (!enchantments.containsKey(key)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     public static Map<Enchantment, Function<ServerStatsCounter, Integer>> customStats = new HashMap<>();
     static {

@@ -5,9 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.example.examplemod.init.ModStats.CustomStats;
-
-import net.minecraft.client.multiplayer.chat.LoggedChatMessage.Player;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -30,7 +28,7 @@ public class EnchantmentProgressSteps {
 
     public static Map<Enchantment, int[]> steps = new HashMap<>();
     static {
-        steps.put(Enchantments.UNBREAKING, new int[] { 600, 1200, 2000 });
+        steps.put(Enchantments.UNBREAKING, new int[] { 1, 3, 6 });
         steps.put(Enchantments.ALL_DAMAGE_PROTECTION, new int[] { 25, 75, 125, 250 });
         steps.put(Enchantments.FIRE_PROTECTION, new int[] { 10, 60, 180, 300 });
         steps.put(Enchantments.BLAST_PROTECTION, new int[] { 3, 10, 25, 50 });
@@ -158,6 +156,18 @@ public class EnchantmentProgressSteps {
         }
 
         return possibleEnchantments;
+    }
+
+    public static Map<Enchantment, Boolean> getBonusEnchantmentsAvailability(Player player) {
+        Map<Enchantment, Integer> playerData = EnchantmentProgressManager.get(player.getServer()).getPlayerData(player);
+        Map<Enchantment, Boolean> bonusEnchantmentsAvailability = new HashMap<Enchantment, Boolean>();
+
+        for (Enchantment enchantment : EnchantmentProgressSteps.bonusEnchantments) {
+            bonusEnchantmentsAvailability.put(enchantment,
+                    EnchantmentUtils.bonusEnchantmentsConditions.get(enchantment).apply(playerData));
+        }
+
+        return bonusEnchantmentsAvailability;
     }
 
 }

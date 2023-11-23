@@ -1,6 +1,7 @@
 package com.example.examplemod;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +36,23 @@ public class EnchantmentProgressManager extends SavedData {
     private final Map<UUID, List<EnchantmentProgressSnapshot>> snapshots = new HashMap<>();
 
     public Map<Enchantment, Integer> getPlayerData(Player player) {
-        return data.get(player.getUUID());
+        Map<Enchantment, Integer> playerData = data.get(player.getUUID());
+
+        if (playerData == null) {
+            playerData = new HashMap<>();
+            data.put(player.getUUID(), playerData);
+            this.setDirty();
+        }
+
+        return playerData;
+    }
+
+    public Map<Enchantment, Integer> getBonusClaimed(Player player) {
+        return bonusClaimed.get(player.getUUID());
+    }
+
+    public List<EnchantmentProgressSnapshot> getProgress(Player player) {
+        return snapshots.get(player.getUUID());
     }
 
     public void setPlayerData(UUID player, Map<Enchantment, Integer> playerData) {
@@ -72,10 +89,6 @@ public class EnchantmentProgressManager extends SavedData {
 
     public void sendDataToPlayer(ServerPlayer player) {
         Map<Enchantment, Integer> playerData = getPlayerData(player);
-
-        if (playerData == null) {
-            return;
-        }
 
         this.getAllPlayerProgress(player);
 
@@ -237,6 +250,14 @@ public class EnchantmentProgressManager extends SavedData {
                                                                                                 // playerData.get(enchantment));
         }
 
+        Collections.sort(filteredEnchantments, (a, b) -> {
+            if (a.status != b.status) {
+                return a.status.ordinal() - b.status.ordinal();
+            } else {
+                return a.enchantment.getFullname(1).toString().compareTo(b.enchantment.getFullname(1).toString());
+            }
+        });
+
         return filteredEnchantments;
     }
 
@@ -271,6 +292,10 @@ public class EnchantmentProgressManager extends SavedData {
         }
 
         return progress >= steps[steps.length - 1];
+    }
+
+    public boolean isMaxLevel(Enchantment enchantment, Player player) {
+        return isMaxLevel(enchantment, getPlayerData(player));
     }
 
     public boolean isMaxLevelInEveryEnchant(Map<Enchantment, Integer> playerData, Enchantment... enchantments) {
@@ -352,6 +377,14 @@ public class EnchantmentProgressManager extends SavedData {
     }
 
     public enum Status {
-        FREE, UNLOCKED, LOCKED
+        FREE("free", 0x00FF00), UNLOCKED("unlocked", 0xFFFFFF), LOCKED("locked", 0x00FFFF);
+
+        public String name;
+        public int color;
+
+        private Status(String name, int color) {
+            this.name = name;
+            this.color = color;
+        }
     }
 }

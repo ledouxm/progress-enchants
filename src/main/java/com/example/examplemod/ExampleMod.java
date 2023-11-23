@@ -11,7 +11,6 @@ import com.example.examplemod.init.ModCreativeTabs;
 import com.example.examplemod.init.ModItems;
 import com.example.examplemod.init.ModMenus;
 import com.example.examplemod.init.ModStats;
-import com.google.common.eventbus.EventBus;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -35,6 +34,7 @@ import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.ShieldBlockEvent;
 import net.minecraftforge.event.entity.player.CriticalHitEvent;
+import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -69,24 +69,31 @@ public class ExampleMod {
     }
 
     @SubscribeEvent
+    public void onPlayerDestroyItem(PlayerDestroyItemEvent event) {
+        Player player = event.getEntity();
+        if (player == null)
+            return;
+
+        System.out.println("Unbreaking");
+        ModStats.CustomStats.UNBREAKING.addToPlayer(player, 1);
+        int unbreakingAmount = ModStats.CustomStats.UNBREAKING.getAmount(player);
+        EnchantmentProgressManager.get(player.getServer()).checkPlayerProgress(player, Enchantments.UNBREAKING,
+                unbreakingAmount);
+    }
+
+    @SubscribeEvent
     public void onBlockBreak(BlockEvent.BreakEvent event) {
         Player player = event.getPlayer();
         if (player == null)
             return;
 
-        System.out.println("Unbreaking");
         System.out.println("Efficiency");
-        ModStats.CustomStats.UNBREAKING.addToPlayer(player, 1);
         ModStats.CustomStats.EFFICIENCY.addToPlayer(player, 1);
 
-        int unbreakingAmount = ModStats.CustomStats.UNBREAKING.getAmount(player);
         int efficiencyAmount = ModStats.CustomStats.EFFICIENCY.getAmount(player);
 
-        System.out.println("Unbreaking amount : " + unbreakingAmount);
         System.out.println("Efficiency amount : " + efficiencyAmount);
 
-        EnchantmentProgressManager.get(player.getServer()).checkPlayerProgress(player, Enchantments.UNBREAKING,
-                unbreakingAmount);
         EnchantmentProgressManager.get(player.getServer()).checkPlayerProgress(player, Enchantments.BLOCK_EFFICIENCY,
                 efficiencyAmount);
 
@@ -165,20 +172,20 @@ public class ExampleMod {
                 addDamage(player, livingSourceEntity);
             }
         }
-        // Fire protection
+
+        boolean isStillAlive = player.getHealth() > event.getAmount();
+        if (!isStillAlive)
+            return;
+
         if (source.is(DamageTypes.IN_FIRE)) {
             ModStats.CustomStats.FIRE_PROTECTION.addToPlayer(player, 1);
         } else if (source.is(DamageTypes.EXPLOSION) || source.is(DamageTypes.PLAYER_EXPLOSION)) {
             ModStats.CustomStats.BLAST_PROTECTION.addToPlayer(player, 1);
         } else if (source.is(DamageTypes.MOB_PROJECTILE)) {
             ModStats.CustomStats.PROJECTILE_PROTECTION.addToPlayer(player, 1);
-        }
-
-        // Feather falling
-        if (event.getAmount() < player.getHealth()) {
+        } else if (source.is(DamageTypes.FALL)) {
             ModStats.CustomStats.FEATHER_FALLING.addToPlayer(player, 1);
         }
-
     }
 
     @SubscribeEvent
@@ -254,6 +261,7 @@ public class ExampleMod {
 
         List<ServerPlayer> players = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers();
 
+        // TODO: check player progress and send message when unlocked
         for (ServerPlayer player : players) {
             ServerStatsCounter counter = player.getStats();
             // Swift sneak
