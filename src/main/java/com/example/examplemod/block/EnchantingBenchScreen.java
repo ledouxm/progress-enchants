@@ -9,6 +9,7 @@ import com.example.examplemod.EnchantmentProgressManager.Status;
 import com.example.examplemod.ExampleMod;
 import com.mojang.logging.LogUtils;
 
+import net.minecraft.client.GuiMessage;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;

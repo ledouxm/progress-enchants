@@ -11,12 +11,16 @@ import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
+import org.slf4j.Logger;
+
 import com.example.examplemod.block.PossibleEnchantment;
 import com.example.examplemod.network.EnchantmentProgressChannel;
-import com.example.examplemod.network.EnchantmentProgressClientboundPacket;
+import com.example.examplemod.network.EnchantmentManagerClientboundPacket;
+import com.mojang.logging.LogUtils;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -26,10 +30,12 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraftforge.common.ForgeConfig.Server;
 import net.minecraftforge.network.PacketDistributor;
 
 public class EnchantmentProgressManager extends SavedData {
     public static final EnchantmentProgressManager clientCopy = new EnchantmentProgressManager();
+    private static final Logger LOGGER = LogUtils.getLogger();
 
     private final Map<UUID, Map<Enchantment, Integer>> data = new HashMap<>();
     private final Map<UUID, Map<Enchantment, Integer>> bonusClaimed = new HashMap<>();
@@ -92,7 +98,7 @@ public class EnchantmentProgressManager extends SavedData {
 
         this.getAllPlayerProgress(player);
 
-        EnchantmentProgressClientboundPacket packet = new EnchantmentProgressClientboundPacket(player.getUUID(),
+        EnchantmentManagerClientboundPacket packet = new EnchantmentManagerClientboundPacket(player.getUUID(),
                 playerData, bonusClaimed.get(player.getUUID()), snapshots.get(player.getUUID()));
 
         System.out.println("Sending data to player " + player.getDisplayName().getString() + ": " + playerData);
@@ -130,19 +136,23 @@ public class EnchantmentProgressManager extends SavedData {
             this.setDirty();
         }
 
-        if (EnchantmentProgressSteps.isBonus(enchantment)) {
-            checkPlayerBonusProgress(player, enchantment, playerData);
-            return;
-        }
+        if (player instanceof ServerPlayer serverPlayer) {
+            if (EnchantmentProgressSteps.isBonus(enchantment)) {
+                checkPlayerBonusProgress(player, enchantment, playerData);
+                return;
+            }
 
-        Integer level = playerData.get(enchantment);
-        int newLevel = EnchantmentProgressSteps.getLevel(enchantment, amount);
+            Integer level = playerData.get(enchantment);
+            int newLevel = EnchantmentProgressSteps.getLevel(enchantment, amount);
 
-        System.out.println("progress: " + level);
-        System.out.println("newProgress: " + newLevel);
+            System.out.println("progress: " + level);
+            System.out.println("newProgress: " + newLevel);
 
-        if (newLevel > 0 && (level == null || newLevel > level)) {
-            unlockEnchantment(enchantment, newLevel, playerData);
+            sendDataToPlayer(serverPlayer);
+
+            if (newLevel > 0 && (level == null || newLevel > level)) {
+                unlockEnchantment(enchantment, newLevel, playerData);
+            }
         }
     }
 
@@ -205,8 +215,10 @@ public class EnchantmentProgressManager extends SavedData {
     }
 
     public void unlockEnchantment(Enchantment enchantment, int level, Map<Enchantment, Integer> playerData) {
-        System.out.println("Unlocking enchantment " + enchantment.getFullname(1) + " with level " + level);
+        LOGGER.info("Unlocking enchantment " + enchantment.getFullname(1) + " with level " + level);
         playerData.put(enchantment, level);
+        EnchantmentNotification.addNotification(
+                Component.literal("Unlocked ").append(enchantment.getFullname(level)).append(Component.literal(" !")));
         this.setDirty();
     }
 

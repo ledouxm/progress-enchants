@@ -22,13 +22,13 @@ import com.example.examplemod.EnchantmentProgressSnapshot;
 import com.example.examplemod.EnchantmentUtils;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
-public class EnchantmentProgressClientboundPacket {
+public class EnchantmentManagerClientboundPacket {
     public final UUID player;
     public final Map<Enchantment, Integer> playerData;
     public final Map<Enchantment, Integer> bonusClaimed;
     public final List<EnchantmentProgressSnapshot> progress;
 
-    public EnchantmentProgressClientboundPacket(UUID player, Map<Enchantment, Integer> playerData,
+    public EnchantmentManagerClientboundPacket(UUID player, Map<Enchantment, Integer> playerData,
             Map<Enchantment, Integer> bonusClaimed, List<EnchantmentProgressSnapshot> progress) {
         this.player = player;
         this.playerData = playerData;
@@ -37,7 +37,7 @@ public class EnchantmentProgressClientboundPacket {
 
     }
 
-    public EnchantmentProgressClientboundPacket(FriendlyByteBuf buffer) {
+    public EnchantmentManagerClientboundPacket(FriendlyByteBuf buffer) {
         System.out.println("Reading data from server");
         this.player = this.readUUID(buffer);
         System.out.println("Player: " + player);
@@ -133,8 +133,8 @@ public class EnchantmentProgressClientboundPacket {
 
     @SubscribeEvent
     public static void registerMessage(FMLCommonSetupEvent event) {
-        EnchantmentProgressChannel.registerMessage(EnchantmentProgressClientboundPacket.class,
-                EnchantmentProgressClientboundPacket::write, EnchantmentProgressClientboundPacket::new,
-                EnchantmentProgressClientboundPacket::handle);
+        EnchantmentProgressChannel.registerMessage(EnchantmentManagerClientboundPacket.class,
+                EnchantmentManagerClientboundPacket::write, EnchantmentManagerClientboundPacket::new,
+                EnchantmentManagerClientboundPacket::handle);
     }
 }

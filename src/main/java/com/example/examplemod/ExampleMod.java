@@ -11,7 +11,10 @@ import com.example.examplemod.init.ModCreativeTabs;
 import com.example.examplemod.init.ModItems;
 import com.example.examplemod.init.ModMenus;
 import com.example.examplemod.init.ModStats;
+import com.google.common.eventbus.Subscribe;
+import com.mojang.blaze3d.platform.Window;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.ServerStatsCounter;
@@ -28,6 +31,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
@@ -66,6 +70,13 @@ public class ExampleMod {
         ModItems.ITEMS.register(modEventBus);
         ModMenus.MENUS.register(modEventBus);
         ModCreativeTabs.TABS.register(modEventBus);
+    }
+
+    @SubscribeEvent
+    public void onRenderOverLayer(RenderGuiOverlayEvent event) {
+        Minecraft instance = Minecraft.getInstance();
+        Window window = instance.getWindow();
+
     }
 
     @SubscribeEvent
