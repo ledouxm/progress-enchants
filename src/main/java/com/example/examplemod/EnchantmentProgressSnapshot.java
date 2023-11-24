@@ -6,17 +6,25 @@ public class EnchantmentProgressSnapshot {
     public final Enchantment enchantment;
     public final int score;
 
-    public final int currentLevel;
-    public final int nextLevelScore;
-    public final int currentLevelScore;
+    public int currentLevel;
+    public int nextLevelScore;
+    public int currentLevelScore;
 
     public EnchantmentProgressSnapshot(Enchantment enchantment, int score) {
         this.enchantment = enchantment;
         this.score = score;
 
+        this.init();
+    }
+
+    public void init() {
         this.currentLevel = EnchantmentProgressSteps.getLevel(enchantment, score);
         this.nextLevelScore = EnchantmentProgressSteps.getNextLevelScore(enchantment, currentLevel);
         this.currentLevelScore = EnchantmentProgressSteps.getCurrentLevelScore(enchantment, currentLevel);
+    }
+
+    public void setScore(int score) {
+        this.init();
     }
 
     public boolean isMaxLevel() {

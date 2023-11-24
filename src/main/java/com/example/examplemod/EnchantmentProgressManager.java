@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 
 import com.example.examplemod.block.PossibleEnchantment;
 import com.example.examplemod.network.EnchantmentProgressChannel;
+import com.example.examplemod.network.AtomicScoreClientboundPacket;
 import com.example.examplemod.network.EnchantmentManagerClientboundPacket;
 import com.mojang.logging.LogUtils;
 
@@ -51,6 +52,25 @@ public class EnchantmentProgressManager extends SavedData {
         }
 
         return playerData;
+    }
+
+    public void setAtomicScore(UUID player, Enchantment enchantment, int score) {
+        List<EnchantmentProgressSnapshot> scores = snapshots.get(player);
+
+        if (scores == null) {
+            scores = new ArrayList<>();
+            snapshots.put(player, scores);
+        }
+
+        EnchantmentProgressSnapshot existing = scores.stream().filter(s -> s.enchantment.equals(enchantment))
+                .findFirst().orElse(null);
+
+        if (existing != null) {
+            scores.remove(existing);
+        }
+
+        scores.add(new EnchantmentProgressSnapshot(enchantment, score));
+
     }
 
     public Map<Enchantment, Integer> getBonusClaimed(Player player) {
@@ -93,6 +113,11 @@ public class EnchantmentProgressManager extends SavedData {
         return null;
     }
 
+    public void sendAtomicDataToPlayer(ServerPlayer player, Enchantment enchantment, int score) {
+        AtomicScoreClientboundPacket packet = new AtomicScoreClientboundPacket(player.getUUID(), enchantment, score);
+        EnchantmentProgressChannel.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);
+    }
+
     public void sendDataToPlayer(ServerPlayer player) {
         Map<Enchantment, Integer> playerData = getPlayerData(player);
 
@@ -124,6 +149,12 @@ public class EnchantmentProgressManager extends SavedData {
     }
 
     public void checkPlayerProgress(Player player, Enchantment enchantment, int amount) {
+        if (!(player instanceof ServerPlayer serverPlayer)) {
+            return;
+        }
+
+        sendAtomicDataToPlayer(serverPlayer, enchantment, amount);
+
         UUID uuid = player.getUUID();
         System.out.println("Checking player progress for " + player.getDisplayName().getString() + " for "
                 + enchantment.getFullname(1) + " with amount " + amount);
@@ -136,23 +167,21 @@ public class EnchantmentProgressManager extends SavedData {
             this.setDirty();
         }
 
-        if (player instanceof ServerPlayer serverPlayer) {
-            if (EnchantmentProgressSteps.isBonus(enchantment)) {
-                checkPlayerBonusProgress(player, enchantment, playerData);
-                return;
-            }
+        if (EnchantmentProgressSteps.isBonus(enchantment)) {
+            checkPlayerBonusProgress(player, enchantment, playerData);
+            return;
+        }
 
-            Integer level = playerData.get(enchantment);
-            int newLevel = EnchantmentProgressSteps.getLevel(enchantment, amount);
+        Integer level = playerData.get(enchantment);
+        int newLevel = EnchantmentProgressSteps.getLevel(enchantment, amount);
 
-            System.out.println("progress: " + level);
-            System.out.println("newProgress: " + newLevel);
+        System.out.println("progress: " + level);
+        System.out.println("newProgress: " + newLevel);
 
-            sendDataToPlayer(serverPlayer);
+        // sendDataToPlayer(serverPlayer);
 
-            if (newLevel > 0 && (level == null || newLevel > level)) {
-                unlockEnchantment(enchantment, newLevel, playerData);
-            }
+        if (newLevel > 0 && (level == null || newLevel > level)) {
+            unlockEnchantment(enchantment, newLevel, playerData);
         }
     }
 
