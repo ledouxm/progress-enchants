@@ -3,22 +3,17 @@ package com.example.examplemod.block;
 import java.util.List;
 
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
 
 import com.example.examplemod.EnchantmentProgressManager.Status;
 import com.example.examplemod.ExampleMod;
-import com.mojang.logging.LogUtils;
 
-import net.minecraft.client.GuiMessage;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.level.block.EnchantmentTableBlock;
 
 public class EnchantingBenchScreen extends AbstractContainerScreen<EnchantingBenchMenu> {
-    private static final Logger LOGGER = LogUtils.getLogger();
 
     private static final int ENCHANTMENT_SRC_X = 88;
     private static final int UNLOCKED_ENCHANTMENT_SRC_Y = 166;

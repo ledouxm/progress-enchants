@@ -3,7 +3,6 @@ package com.example.examplemod;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.CrossbowItem;
-import net.minecraft.world.item.FishingRodItem;
 import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;

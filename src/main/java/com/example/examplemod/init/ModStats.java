@@ -1,7 +1,5 @@
 package com.example.examplemod.init;
 
-import java.util.List;
-
 import com.example.examplemod.EnchantmentProgressManager;
 import com.example.examplemod.ExampleMod;
 
@@ -15,7 +13,6 @@ import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraftforge.common.ForgeConfig.Server;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
@@ -33,7 +30,6 @@ public class ModStats {
 
     public enum CustomStats {
         UNBREAKING("unbreaking", Enchantments.UNBREAKING),
-        // MENDING("mending"),
         PROTECTION("protection", Enchantments.ALL_DAMAGE_PROTECTION),
         FIRE_PROTECTION("fire_protection", Enchantments.FIRE_PROTECTION),
         BLAST_PROTECTION("blast_protection", Enchantments.BLAST_PROTECTION),
@@ -54,19 +50,15 @@ public class ModStats {
         LOOTING("looting", Enchantments.MOB_LOOTING),
         SWEEPING_EDGE("sweeping_edge", Enchantments.SWEEPING_EDGE),
         EFFICIENCY("efficiency", Enchantments.BLOCK_EFFICIENCY),
-        // SILK_TOUCH("silk_touch"),
         FORTUNE("fortune", Enchantments.BLOCK_FORTUNE),
-        // CHANNELING("channeling"),
         LOYALTY("loyalty", Enchantments.LOYALTY),
         RIPTIDE("riptide", Enchantments.RIPTIDE),
         IMPALING("impaling", Enchantments.IMPALING),
         POWER("power", Enchantments.POWER_ARROWS),
         PUNCH("punch", Enchantments.PUNCH_ARROWS),
-        // MULTISHOT("multishot"),
         PIERCING("piercing", Enchantments.PIERCING),
         QUICK_CHARGE("quick_charge", Enchantments.QUICK_CHARGE),
         FLAME("flame", Enchantments.FLAMING_ARROWS),
-        // INFINITY("infinity"),
         LUCK_OF_THE_SEA("luck_of_the_sea", Enchantments.FISHING_LUCK),
         LURE("lure", Enchantments.FISHING_SPEED);
 

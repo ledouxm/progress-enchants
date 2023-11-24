@@ -7,18 +7,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.world.item.AxeItem;
-import net.minecraft.world.item.BookItem;
-import net.minecraft.world.item.EnchantedBookItem;
-import net.minecraft.world.item.HoeItem;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.ShovelItem;
-import net.minecraft.world.item.SwordItem;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 
 public class EnchantingBenchRenderer implements BlockEntityRenderer<EnchantingBenchEntity> {
@@ -27,7 +18,6 @@ public class EnchantingBenchRenderer implements BlockEntityRenderer<EnchantingBe
 
     public EnchantingBenchRenderer(BlockEntityRendererProvider.Context context) {
         item = new ItemStack(Items.IRON_SWORD, 1);
-        item.enchant(Enchantments.UNBREAKING, 1);
     }
 
     @Override
@@ -41,24 +31,9 @@ public class EnchantingBenchRenderer implements BlockEntityRenderer<EnchantingBe
         poseStack.pushPose();
         poseStack.translate(0.5f, 1f, 0.5f);
 
-        Item rawItem = item.getItem();
-        if (rawItem instanceof SwordItem || rawItem instanceof ShovelItem) {
-            poseStack.mulPose(Axis.YN.rotationDegrees(45f));
-            poseStack.mulPose(Axis.XN.rotationDegrees(180f));
-            poseStack.mulPose(Axis.ZN.rotationDegrees(45f));
-        } else if (rawItem instanceof AxeItem || rawItem instanceof HoeItem) {
-            poseStack.mulPose(Axis.XN.rotationDegrees(180f));
-            poseStack.mulPose(Axis.YN.rotationDegrees(-45f));
-        } else if (rawItem instanceof BookItem || rawItem instanceof EnchantedBookItem) {
-            poseStack.mulPose(Axis.XN.rotationDegrees(180f));
-            poseStack.mulPose(Axis.YN.rotationDegrees(90f));
-        } else {
-
-            poseStack.mulPose(Axis.XN.rotationDegrees(180f));
-            poseStack.mulPose(Axis.YN.rotationDegrees(45f));
-            // poseStack.mulPose(Axis.XN.rotationDegrees(180f));
-            // poseStack.mulPose(Axis.YN.rotationDegrees(45f));
-        }
+        poseStack.mulPose(Axis.YN.rotationDegrees(45f));
+        poseStack.mulPose(Axis.XN.rotationDegrees(180f));
+        poseStack.mulPose(Axis.ZN.rotationDegrees(45f));
 
         poseStack.scale(0.5f, 0.5f, 0.5f);
         Minecraft.getInstance().getItemRenderer().renderStatic(item, ItemDisplayContext.FIXED,

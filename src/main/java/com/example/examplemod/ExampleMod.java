@@ -12,7 +12,6 @@ import com.example.examplemod.init.ModMenus;
 import com.example.examplemod.init.ModStats;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -53,7 +52,6 @@ public class ExampleMod {
 
     public ExampleMod() {
         MinecraftForge.EVENT_BUS.register(this);
-        MinecraftForge.EVENT_BUS.register(CustomEventHandler.class);
 
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 

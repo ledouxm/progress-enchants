@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
 
 import com.example.examplemod.EnchantmentProgressManager;
 import com.example.examplemod.EnchantmentProgressSnapshot;
@@ -13,7 +12,6 @@ import com.example.examplemod.EnchantmentProgressSteps;
 import com.example.examplemod.EnchantmentUtils;
 import com.example.examplemod.ExampleMod;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.logging.LogUtils;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
@@ -31,9 +29,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class AdventureBookScreen extends Screen {
-
-    private static final Logger LOGGER = LogUtils.getLogger();
-
     public static final ResourceLocation TEXTURE = new ResourceLocation(ExampleMod.MODID,
             "textures/gui/adventure_book_screen.png");
 
