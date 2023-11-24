@@ -101,17 +101,13 @@ public class EnchantingBenchMenu extends AbstractContainerMenu {
     }
 
     private void updatePossibleEnchantments(ItemStack item, Player player) {
-        // System.out.println("updatePossibleEnchantments with item " + item);
         if (item == null || item.isEmpty()) {
             possibleEnchantments = null;
             return;
         }
         List<Enchantment> possibleEnchantmentsForItem = EnchantmentProgressSteps.getPossibleEnchantmentsForItem(item);
-        // System.out.println("possibleEnchantmentsForItem: " +
-        // possibleEnchantmentsForItem);
         this.possibleEnchantments = EnchantmentProgressManager.get(null)
                 .filterEnchantmentsListForPlayer(possibleEnchantmentsForItem, player);
-        // System.out.println("possibleEnchantments: " + possibleEnchantments);
 
     }
 
@@ -182,22 +178,15 @@ public class EnchantingBenchMenu extends AbstractContainerMenu {
         ItemStack rawStack = quickMovedSlot.getItem();
         quickMovedStack = rawStack.copy();
 
-        // System.out.println("rawStack: " + rawStack + " : " + index);
-
         if (index == ENCHANTING_SLOT) {
-            // System.out.println("ENCHANTING_SLOT");
             if (!this.moveItemStackTo(rawStack, 0, 36, false)) {
                 return ItemStack.EMPTY;
             }
             onItemChange(rawStack, player);
 
         } else if (EnchantmentProgressSteps.canEnchant(rawStack)) {
-            // System.out.println("canEnchant");
 
-            quickMovedStack = rawStack.copyWithCount(1);
-            rawStack.shrink(1);
-
-            if (!this.moveItemStackTo(quickMovedStack, ENCHANTING_SLOT, ENCHANTING_SLOT + 1, false)) {
+            if (!this.moveItemStackTo(rawStack, ENCHANTING_SLOT, ENCHANTING_SLOT + 1, false)) {
                 return ItemStack.EMPTY;
             }
             onItemChange(quickMovedStack, player);

@@ -104,7 +104,6 @@ public class EnchantingBenchScreen extends AbstractContainerScreen<EnchantingBen
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scroll) {
-        System.out.println("Mouse scrolled " + mouseX + " " + mouseY + " " + scroll);
         if (!this.canBeScrolled) {
             return true;
         }
@@ -120,11 +119,8 @@ public class EnchantingBenchScreen extends AbstractContainerScreen<EnchantingBen
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int clickType) {
-        System.out.println("Mouse clicked " + mouseX + " " + mouseY + " " + clickType);
-
         if (mouseX >= leftPos + SLIDER_X && mouseX <= leftPos + SLIDER_X + SLIDER_WIDTH && mouseY >= sliderY
                 && mouseY <= sliderY + SLIDER_HEIGHT) {
-            System.out.println("Mouse clicked on slider");
             this.isDragging = true;
             return super.mouseClicked(mouseX, mouseY, clickType);
         }
@@ -136,7 +132,6 @@ public class EnchantingBenchScreen extends AbstractContainerScreen<EnchantingBen
         }
 
         int enchantmentIndex = (int) Math.floor((mouseY - topPos - PANEL_Y + scrollOffset) / ITEM_HEIGHT);
-        System.out.println("enchantIndex: " + enchantmentIndex);
 
         if (enchantmentIndex < startEnchantIndex || enchantmentIndex >= endEnchantIndex) {
             return super.mouseClicked(mouseX, mouseY, clickType);

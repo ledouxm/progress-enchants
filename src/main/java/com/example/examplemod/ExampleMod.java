@@ -149,7 +149,6 @@ public class ExampleMod {
 
     public void onDamageTaken(Player player, LivingDamageEvent event) {
         DamageSource source = event.getSource();
-        System.out.println(source.toString());
 
         boolean isStillAlive = player.getHealth() > event.getAmount();
         if (!isStillAlive)

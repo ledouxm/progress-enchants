@@ -114,7 +114,6 @@ public class EnchantmentManagerClientboundPacket {
     public boolean handle(Supplier<NetworkEvent.Context> context) {
         context.get().enqueueWork(() -> {
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-                System.out.println("Received data from server: " + playerData);
                 EnchantmentProgressManager.clientCopy.setPlayerData(player, playerData);
                 EnchantmentProgressManager.clientCopy.setBonusClaimed(player, bonusClaimed);
                 EnchantmentProgressManager.clientCopy.setProgress(player, progress);

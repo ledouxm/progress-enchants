@@ -20,7 +20,6 @@ public class AdventureBookItem extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack item = player.getItemInHand(hand);
-        System.out.println("AdventureBookItem.use: " + item);
 
         if (level.isClientSide()) {
             ClientModHandler.openAdventureItemScreen(player);

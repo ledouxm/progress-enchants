@@ -126,7 +126,6 @@ public class EnchantmentProgressManager extends SavedData {
         EnchantmentManagerClientboundPacket packet = new EnchantmentManagerClientboundPacket(player.getUUID(),
                 playerData, bonusClaimed.get(player.getUUID()), snapshots.get(player.getUUID()));
 
-        System.out.println("Sending data to player " + player.getDisplayName().getString() + ": " + playerData);
         EnchantmentProgressChannel.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);
     }
 
@@ -165,11 +164,8 @@ public class EnchantmentProgressManager extends SavedData {
         sendAtomicDataToPlayer(serverPlayer, enchantment, amount);
 
         UUID uuid = player.getUUID();
-        System.out.println("Checking player progress for " + player.getDisplayName().getString() + " for "
-                + enchantment.getFullname(1) + " with amount " + amount);
         Map<Enchantment, Integer> playerData = data.get(uuid);
 
-        System.out.println("playerData: " + playerData);
         if (playerData == null) {
             playerData = new HashMap<>();
             data.put(uuid, playerData);
@@ -183,9 +179,6 @@ public class EnchantmentProgressManager extends SavedData {
 
         Integer level = playerData.get(enchantment);
         int newLevel = EnchantmentProgressSteps.getLevel(enchantment, amount);
-
-        System.out.println("progress: " + level);
-        System.out.println("newProgress: " + newLevel);
 
         // sendDataToPlayer(serverPlayer);
 
@@ -307,7 +300,6 @@ public class EnchantmentProgressManager extends SavedData {
 
     public List<PossibleEnchantment> filterEnchantmentsListForPlayer(List<Enchantment> enchantments, Player player) {
         Map<Enchantment, Integer> playerData = getPlayerData(player);
-        System.out.println("playerData: " + playerData);
 
         List<PossibleEnchantment> filteredEnchantments = new ArrayList<>();
 
