@@ -37,7 +37,7 @@
   "enchantment.examplemod.luck_of_the_sea.desc": "Catch treasures",
   "enchantment.examplemod.lure.desc": "Catch fish",
   "block.examplemod.enchanting_bench": "Enchanting Bench",
-  "item.examplemod.adventure_book": "Enchanting Bench",
+  "item.examplemod.adventure_book": "Adventure book",
   "itemGroup.examplemod.enchanting_progress_tab": "Enchanting Progress items",
   "container.examplemod.enchanting_bench_menu": "Enchanting Bench"
 }
