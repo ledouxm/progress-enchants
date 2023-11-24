@@ -15,7 +15,7 @@
       "item": "minecraft:book"
     },
     "W": {
-      "item": "minecraft:planks"
+      "tag": "minecraft:planks"
     }
   },
   "result": {
