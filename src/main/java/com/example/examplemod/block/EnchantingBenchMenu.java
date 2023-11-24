@@ -11,7 +11,6 @@ import com.example.examplemod.EnchantmentProgressSteps;
 import com.example.examplemod.EnchantmentProgressManager.Status;
 import com.example.examplemod.init.ModBlocks;
 import com.example.examplemod.init.ModMenus;
-import com.mojang.logging.LogUtils;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.sounds.SoundEvents;
@@ -30,7 +29,6 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class EnchantingBenchMenu extends AbstractContainerMenu {
-    private static final Logger LOGGER = LogUtils.getLogger();
 
     private final ContainerLevelAccess levelAccess;
     public static final int ENCHANTING_SLOT = 36;
@@ -44,8 +42,13 @@ public class EnchantingBenchMenu extends AbstractContainerMenu {
         @Override
         public boolean canPlaceItem(int slot, ItemStack item) {
             return EnchantmentProgressSteps.canEnchant(item);
-
         };
+
+        @Override
+        public int getMaxStackSize() {
+            return 1;
+        };
+
     };
 
     private List<PossibleEnchantment> possibleEnchantments = new ArrayList<>();
@@ -55,12 +58,10 @@ public class EnchantingBenchMenu extends AbstractContainerMenu {
     public EnchantingBenchMenu(int containerId, Inventory playerInventory, FriendlyByteBuf additionalData) {
         this(containerId, playerInventory,
                 playerInventory.player.level().getBlockEntity(additionalData.readBlockPos()));
-        LOGGER.info("EnchantingBenchMenu constructor with buffer");
     }
 
     public EnchantingBenchMenu(int containerId, Inventory playerInventory, BlockEntity blockEntity) {
         super(ModMenus.ENCHANTING_BENCH_MENU.get(), containerId);
-        LOGGER.info("EnchantingBenchMenu constructor with blockEntity");
         if (!(blockEntity instanceof EnchantingBenchEntity entity)) {
             throw new IllegalStateException("Block entity is not an enchanting bench");
         }
@@ -134,25 +135,20 @@ public class EnchantingBenchMenu extends AbstractContainerMenu {
 
         if (!item.canApplyAtEnchantingTable(enchantment.enchantment)
                 && !(isBook && enchantment.enchantment.isAllowedOnBooks())) {
-            LOGGER.info("Item cannot be enchanted with " + enchantment.enchantment);
             return false;
         }
 
         for (Map.Entry<Enchantment, Integer> entry : EnchantmentHelper.getEnchantments(item).entrySet()) {
             Enchantment currentEnchantment = entry.getKey();
             if (!currentEnchantment.isCompatibleWith(enchantment.enchantment)) {
-                LOGGER.info("Item cannot be enchanted with " + enchantment.enchantment
-                        + " because it is not compatible with " + currentEnchantment);
                 return false;
             }
         }
 
         this.levelAccess.execute((level, blockPos) -> {
-            LOGGER.info("Où suis je ?");
             entity.enchantItem(item, enchantment);
 
             if (!isFree) {
-                LOGGER.info("Item is not free, removing " + enchantment.cost + " levels");
                 player.experienceLevel -= enchantment.cost;
             } else {
                 EnchantmentProgressManager.get(player.getServer()).claimBonus(player, enchantment.enchantment,
@@ -199,7 +195,11 @@ public class EnchantingBenchMenu extends AbstractContainerMenu {
 
         } else if (EnchantmentProgressSteps.canEnchant(rawStack)) {
             // System.out.println("canEnchant");
-            if (!this.moveItemStackTo(rawStack, ENCHANTING_SLOT, ENCHANTING_SLOT + 1, false)) {
+
+            quickMovedStack = rawStack.copyWithCount(1);
+            rawStack.shrink(1);
+
+            if (!this.moveItemStackTo(quickMovedStack, ENCHANTING_SLOT, ENCHANTING_SLOT + 1, false)) {
                 return ItemStack.EMPTY;
             }
             onItemChange(quickMovedStack, player);

@@ -17,6 +17,7 @@ import com.example.examplemod.block.PossibleEnchantment;
 import com.example.examplemod.network.EnchantmentProgressChannel;
 import com.example.examplemod.network.AtomicScoreClientboundPacket;
 import com.example.examplemod.network.EnchantmentManagerClientboundPacket;
+import com.example.examplemod.network.EnchantmentNotificationClientboundPacket;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.nbt.CompoundTag;
@@ -65,11 +66,13 @@ public class EnchantmentProgressManager extends SavedData {
         EnchantmentProgressSnapshot existing = scores.stream().filter(s -> s.enchantment.equals(enchantment))
                 .findFirst().orElse(null);
 
+        int index = scores.indexOf(existing);
+
         if (existing != null) {
             scores.remove(existing);
         }
 
-        scores.add(new EnchantmentProgressSnapshot(enchantment, score));
+        scores.add(index, new EnchantmentProgressSnapshot(enchantment, score));
 
     }
 
@@ -130,12 +133,18 @@ public class EnchantmentProgressManager extends SavedData {
         EnchantmentProgressChannel.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);
     }
 
+    public void sendNotificationToPlayer(ServerPlayer player, Enchantment enchantment, int level) {
+        EnchantmentNotificationClientboundPacket packet = new EnchantmentNotificationClientboundPacket(enchantment,
+                level);
+        EnchantmentProgressChannel.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);
+    }
+
     public List<EnchantmentProgressSnapshot> getAllPlayerProgress(Player player) {
         if (player instanceof ServerPlayer serverPlayer) {
             List<EnchantmentProgressSnapshot> progress = new ArrayList<>();
 
             ServerStatsCounter stats = serverPlayer.getStats();
-            for (Map.Entry<Enchantment, Function<ServerStatsCounter, Integer>> entry : EnchantmentUtils.customStats
+            for (Map.Entry<Enchantment, Function<ServerStatsCounter, Integer>> entry : EnchantmentUtils.enchantmentRequirements
                     .entrySet()) {
                 progress.add(new EnchantmentProgressSnapshot(entry.getKey(), entry.getValue().apply(stats)));
             }
@@ -148,10 +157,13 @@ public class EnchantmentProgressManager extends SavedData {
         }
     }
 
-    public void checkPlayerProgress(Player player, Enchantment enchantment, int amount) {
+    public void checkPlayerProgress(Player player, Enchantment enchantment) {
         if (!(player instanceof ServerPlayer serverPlayer)) {
             return;
         }
+
+        int amount = EnchantmentUtils.enchantmentRequirements.get(enchantment)
+                .apply(serverPlayer.getStats());
 
         sendAtomicDataToPlayer(serverPlayer, enchantment, amount);
 
@@ -168,7 +180,7 @@ public class EnchantmentProgressManager extends SavedData {
         }
 
         if (EnchantmentProgressSteps.isBonus(enchantment)) {
-            checkPlayerBonusProgress(player, enchantment, playerData);
+            checkPlayerBonusProgress(enchantment, playerData, serverPlayer);
             return;
         }
 
@@ -181,7 +193,7 @@ public class EnchantmentProgressManager extends SavedData {
         // sendDataToPlayer(serverPlayer);
 
         if (newLevel > 0 && (level == null || newLevel > level)) {
-            unlockEnchantment(enchantment, newLevel, playerData);
+            unlockEnchantment(enchantment, newLevel, playerData, serverPlayer);
         }
     }
 
@@ -240,43 +252,60 @@ public class EnchantmentProgressManager extends SavedData {
             data.put(player.getUUID(), playerData);
         }
 
-        this.unlockEnchantment(enchantment, level, playerData);
+        this.unlockEnchantment(enchantment, level, playerData, (ServerPlayer) player);
     }
 
-    public void unlockEnchantment(Enchantment enchantment, int level, Map<Enchantment, Integer> playerData) {
+    public void unlockEnchantment(Enchantment enchantment, int level, Map<Enchantment, Integer> playerData,
+            ServerPlayer player) {
         LOGGER.info("Unlocking enchantment " + enchantment.getFullname(1) + " with level " + level);
         playerData.put(enchantment, level);
-        EnchantmentNotification.addNotification(
-                Component.literal("Unlocked ").append(enchantment.getFullname(level)).append(Component.literal(" !")));
+
+        sendNotificationToPlayer(player, enchantment, level);
+
+        if (!EnchantmentProgressSteps.isBonus(enchantment)) {
+            Enchantment bonusEnchantment = this.getBonusEnchantmentsRequiring(enchantment);
+            if (bonusEnchantment != null) {
+                this.checkPlayerBonusProgress(bonusEnchantment, playerData, player);
+            }
+        }
+
         this.setDirty();
     }
 
-    public void checkPlayerBonusProgress(Player player, Enchantment enchantment, Map<Enchantment, Integer> playerData) {
-        if (enchantment.equals(Enchantments.MENDING)) {
-            if (isMaxLevelInEveryEnchant(playerData, Enchantments.ALL_DAMAGE_PROTECTION, Enchantments.SHARPNESS,
-                    Enchantments.BLOCK_EFFICIENCY, Enchantments.POWER_ARROWS, Enchantments.FISHING_LUCK,
-                    Enchantments.FISHING_SPEED)) {
-                unlockEnchantment(enchantment, 1, playerData);
-            }
-
-        } else if (enchantment.equals(Enchantments.SILK_TOUCH)) {
-            if (isMaxLevelInEveryEnchant(playerData, Enchantments.BLOCK_FORTUNE, Enchantments.BLOCK_EFFICIENCY)) {
-                unlockEnchantment(enchantment, 1, playerData);
-            }
-        } else if (enchantment.equals(Enchantments.CHANNELING)) {
-            if (isMaxLevelInEveryEnchant(playerData, Enchantments.LOYALTY, Enchantments.RIPTIDE)) {
-                unlockEnchantment(enchantment, 1, playerData);
-            }
-        } else if (enchantment.equals(Enchantments.INFINITY_ARROWS)) {
-            if (isMaxLevelInEveryEnchant(playerData, Enchantments.PUNCH_ARROWS, Enchantments.POWER_ARROWS,
-                    Enchantments.FLAMING_ARROWS)) {
-                unlockEnchantment(enchantment, 1, playerData);
-            }
-        } else if (enchantment.equals(Enchantments.MULTISHOT)) {
-            if (isMaxLevelInEveryEnchant(playerData, Enchantments.PIERCING, Enchantments.QUICK_CHARGE)) {
-                unlockEnchantment(enchantment, 1, playerData);
+    public Enchantment getBonusEnchantmentsRequiring(Enchantment enchantment) {
+        for (Map.Entry<Enchantment, List<Enchantment>> bonusEnchantment : EnchantmentUtils.bonusEnchantmentsRequirements
+                .entrySet()) {
+            if (bonusEnchantment.getValue().contains(enchantment)) {
+                return bonusEnchantment.getKey();
             }
         }
+
+        return null;
+    }
+
+    public void checkPlayerBonusProgress(Enchantment enchantment, Map<Enchantment, Integer> playerData,
+            ServerPlayer player) {
+        if (!hasBonusEnchantment(player, enchantment)) {
+            return;
+        }
+
+        unlockEnchantment(enchantment, 1, playerData, player);
+    }
+
+    public boolean hasBonusEnchantment(Player player, Enchantment enchantment) {
+        List<Enchantment> requirements = EnchantmentUtils.bonusEnchantmentsRequirements.get(enchantment);
+
+        if (requirements == null) {
+            return false;
+        }
+
+        for (Enchantment requirement : requirements) {
+            if (!isMaxLevel(requirement, getPlayerData(player))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public List<PossibleEnchantment> filterEnchantmentsListForPlayer(List<Enchantment> enchantments, Player player) {

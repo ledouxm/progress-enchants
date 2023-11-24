@@ -34,6 +34,10 @@
   "enchantment.examplemod.quick_charge.desc": "Shoot arrows with crossbow",
   "enchantment.examplemod.flame.desc": "Hit mobs with fire arrows",
   "enchantment.examplemod.infinity.desc": "Power + Punch + Flame",
-  "enchantment.examplemod.luck_of_the_sea.desc": "Catch fish",
-  "enchantment.examplemod.lure.desc": "Use fishing rod"
+  "enchantment.examplemod.luck_of_the_sea.desc": "Catch treasures",
+  "enchantment.examplemod.lure.desc": "Catch fish",
+  "block.examplemod.enchanting_bench": "Enchanting Bench",
+  "item.examplemod.adventure_book": "Enchanting Bench",
+  "itemGroup.examplemod.enchanting_progress_tab": "Enchanting Progress items",
+  "container.examplemod.enchanting_bench_menu": "Enchanting Bench"
 }

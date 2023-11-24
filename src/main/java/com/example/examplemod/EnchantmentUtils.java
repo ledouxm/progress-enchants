@@ -52,50 +52,51 @@ public class EnchantmentUtils {
         return true;
     }
 
-    public static Map<Enchantment, Function<ServerStatsCounter, Integer>> customStats = new HashMap<>();
+    public static Map<Enchantment, Function<ServerStatsCounter, Integer>> enchantmentRequirements = new HashMap<>();
     static {
-        customStats.put(Enchantments.UNBREAKING, stats -> CustomStats.UNBREAKING.getAmount(stats));
-        customStats.put(Enchantments.ALL_DAMAGE_PROTECTION, stats -> CustomStats.PROTECTION.getAmount(stats));
-        customStats.put(Enchantments.FIRE_PROTECTION, stats -> CustomStats.FIRE_PROTECTION.getAmount(stats));
-        customStats.put(Enchantments.BLAST_PROTECTION, stats -> CustomStats.BLAST_PROTECTION.getAmount(stats));
-        customStats.put(Enchantments.PROJECTILE_PROTECTION,
+        enchantmentRequirements.put(Enchantments.UNBREAKING, stats -> CustomStats.UNBREAKING.getAmount(stats));
+        enchantmentRequirements.put(Enchantments.ALL_DAMAGE_PROTECTION,
+                stats -> CustomStats.PROTECTION.getAmount(stats));
+        enchantmentRequirements.put(Enchantments.FIRE_PROTECTION,
+                stats -> CustomStats.FIRE_PROTECTION.getAmount(stats));
+        enchantmentRequirements.put(Enchantments.BLAST_PROTECTION,
+                stats -> CustomStats.BLAST_PROTECTION.getAmount(stats));
+        enchantmentRequirements.put(Enchantments.PROJECTILE_PROTECTION,
                 stats -> CustomStats.PROJECTILE_PROTECTION.getAmount(stats));
-        customStats.put(Enchantments.THORNS, stats -> CustomStats.THORNS.getAmount(stats));
-        customStats.put(Enchantments.RESPIRATION, stats -> CustomStats.RESPIRATION.getAmount(stats));
-        customStats.put(Enchantments.AQUA_AFFINITY, stats -> CustomStats.AQUA_AFFINITY.getAmount(stats));
-        customStats.put(Enchantments.FALL_PROTECTION, stats -> CustomStats.FEATHER_FALLING.getAmount(stats));
-        customStats.put(Enchantments.DEPTH_STRIDER, stats -> CustomStats.DEPTH_STRIDER.getAmount(stats));
-        customStats.put(Enchantments.SOUL_SPEED, stats -> CustomStats.SOUL_SPEED.getAmount(stats));
-        customStats.put(Enchantments.SHARPNESS, stats -> CustomStats.SHARPNESS.getAmount(stats));
-        customStats.put(Enchantments.KNOCKBACK, stats -> CustomStats.KNOCKBACK.getAmount(stats));
-        customStats.put(Enchantments.FIRE_ASPECT, stats -> CustomStats.FIRE_ASPECT.getAmount(stats));
-        customStats.put(Enchantments.SWEEPING_EDGE, stats -> CustomStats.SWEEPING_EDGE.getAmount(stats));
-        customStats.put(Enchantments.BLOCK_EFFICIENCY, stats -> CustomStats.EFFICIENCY.getAmount(stats));
-        customStats.put(Enchantments.BLOCK_FORTUNE, stats -> CustomStats.FORTUNE.getAmount(stats));
-        customStats.put(Enchantments.LOYALTY, stats -> CustomStats.LOYALTY.getAmount(stats));
-        customStats.put(Enchantments.PUNCH_ARROWS, stats -> CustomStats.PUNCH.getAmount(stats));
-        customStats.put(Enchantments.PIERCING, stats -> CustomStats.PIERCING.getAmount(stats));
-        customStats.put(Enchantments.FLAMING_ARROWS, stats -> CustomStats.FLAME.getAmount(stats));
-        customStats.put(Enchantments.SWIFT_SNEAK, stats -> stats.getValue(Stats.CUSTOM.get(Stats.CROUCH_ONE_CM)));
-        customStats.put(Enchantments.RIPTIDE, stats -> stats.getValue(Stats.ITEM_USED.get(Items.TRIDENT)));
-        customStats.put(Enchantments.QUICK_CHARGE, stats -> stats.getValue(Stats.ITEM_USED.get(Items.CROSSBOW)));
-        customStats.put(Enchantments.POWER_ARROWS, stats -> stats.getValue(Stats.ITEM_USED.get(Items.BOW)));
-        customStats.put(Enchantments.IMPALING, stats -> stats.getValue(Stats.ENTITY_KILLED.get(EntityType.DROWNED)));
-        customStats.put(Enchantments.SMITE, stats -> CustomStatsUtils.getNbUndeadKilled(stats));
-        customStats.put(Enchantments.BANE_OF_ARTHROPODS, stats -> CustomStatsUtils.getNbArthropodKilled(stats));
-        customStats.put(Enchantments.MOB_LOOTING, stats -> CustomStatsUtils.getNbMonsterKilled(stats));
-        customStats.put(Enchantments.SHARPNESS, stats -> {
-            int cptSwordHits = stats.getValue(Stats.ITEM_USED.get(Items.IRON_SWORD));
-            cptSwordHits += stats.getValue(Stats.ITEM_USED.get(Items.DIAMOND_SWORD));
-            cptSwordHits += stats.getValue(Stats.ITEM_USED.get(Items.GOLDEN_SWORD));
-            cptSwordHits += stats.getValue(Stats.ITEM_USED.get(Items.STONE_SWORD));
-            cptSwordHits += stats.getValue(Stats.ITEM_USED.get(Items.WOODEN_SWORD));
-            cptSwordHits += stats.getValue(Stats.ITEM_USED.get(Items.NETHERITE_SWORD));
+        enchantmentRequirements.put(Enchantments.THORNS, stats -> CustomStats.THORNS.getAmount(stats));
+        enchantmentRequirements.put(Enchantments.RESPIRATION, stats -> CustomStats.RESPIRATION.getAmount(stats));
+        enchantmentRequirements.put(Enchantments.AQUA_AFFINITY, stats -> CustomStats.AQUA_AFFINITY.getAmount(stats));
+        enchantmentRequirements.put(Enchantments.FALL_PROTECTION,
+                stats -> CustomStats.FEATHER_FALLING.getAmount(stats));
+        enchantmentRequirements.put(Enchantments.DEPTH_STRIDER, stats -> CustomStats.DEPTH_STRIDER.getAmount(stats));
+        enchantmentRequirements.put(Enchantments.SOUL_SPEED, stats -> CustomStats.SOUL_SPEED.getAmount(stats));
+        enchantmentRequirements.put(Enchantments.FROST_WALKER, stats -> CustomStats.FROST_WALKER.getAmount(stats));
 
-            return cptSwordHits;
-        });
-        customStats.put(Enchantments.FISHING_LUCK, stats -> stats.getValue(Stats.CUSTOM.get(Stats.FISH_CAUGHT)));
-        customStats.put(Enchantments.FISHING_SPEED, stats -> stats.getValue(Stats.ITEM_USED.get(Items.FISHING_ROD)));
+        enchantmentRequirements.put(Enchantments.SHARPNESS, stats -> CustomStats.SHARPNESS.getAmount(stats));
+        enchantmentRequirements.put(Enchantments.KNOCKBACK, stats -> CustomStats.KNOCKBACK.getAmount(stats));
+        enchantmentRequirements.put(Enchantments.FIRE_ASPECT, stats -> CustomStats.FIRE_ASPECT.getAmount(stats));
+        enchantmentRequirements.put(Enchantments.SWEEPING_EDGE, stats -> CustomStats.SWEEPING_EDGE.getAmount(stats));
+        enchantmentRequirements.put(Enchantments.BLOCK_EFFICIENCY, stats -> CustomStats.EFFICIENCY.getAmount(stats));
+        enchantmentRequirements.put(Enchantments.BLOCK_FORTUNE, stats -> CustomStats.FORTUNE.getAmount(stats));
+        enchantmentRequirements.put(Enchantments.LOYALTY, stats -> CustomStats.LOYALTY.getAmount(stats));
+        enchantmentRequirements.put(Enchantments.PUNCH_ARROWS, stats -> CustomStats.PUNCH.getAmount(stats));
+        enchantmentRequirements.put(Enchantments.PIERCING, stats -> CustomStats.PIERCING.getAmount(stats));
+        enchantmentRequirements.put(Enchantments.FLAMING_ARROWS, stats -> CustomStats.FLAME.getAmount(stats));
+        enchantmentRequirements.put(Enchantments.SWIFT_SNEAK, stats -> CustomStats.SWIFT_SNEAK.getAmount(stats));
+        enchantmentRequirements.put(Enchantments.RIPTIDE, stats -> stats.getValue(Stats.ITEM_USED.get(Items.TRIDENT)));
+        enchantmentRequirements.put(Enchantments.QUICK_CHARGE,
+                stats -> stats.getValue(Stats.ITEM_USED.get(Items.CROSSBOW)));
+        enchantmentRequirements.put(Enchantments.POWER_ARROWS, stats -> stats.getValue(Stats.ITEM_USED.get(Items.BOW)));
+        enchantmentRequirements.put(Enchantments.IMPALING,
+                stats -> CustomStats.IMPALING.getAmount(stats));
+        enchantmentRequirements.put(Enchantments.SMITE, stats -> CustomStats.SMITE.getAmount(stats));
+        enchantmentRequirements.put(Enchantments.BANE_OF_ARTHROPODS,
+                stats -> CustomStats.BANE_OF_ARTHROPODS.getAmount(stats));
+        enchantmentRequirements.put(Enchantments.MOB_LOOTING, stats -> CustomStats.LOOTING.getAmount(stats));
+        enchantmentRequirements.put(Enchantments.FISHING_LUCK,
+                stats -> CustomStats.LUCK_OF_THE_SEA.getAmount(stats));
+        enchantmentRequirements.put(Enchantments.FISHING_SPEED,
+                stats -> CustomStats.LURE.getAmount(stats));
     }
 
     private static Map<String, Enchantment> enchantments = new HashMap<>();

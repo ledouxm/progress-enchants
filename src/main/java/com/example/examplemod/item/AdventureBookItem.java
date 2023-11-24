@@ -1,8 +1,8 @@
 package com.example.examplemod.item;
 
 import com.example.examplemod.EnchantmentProgressManager;
+import com.example.examplemod.client.ClientModHandler;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -23,7 +23,8 @@ public class AdventureBookItem extends Item {
         System.out.println("AdventureBookItem.use: " + item);
 
         if (level.isClientSide()) {
-            Minecraft.getInstance().setScreen(new AdventureBookScreen(player));
+            ClientModHandler.openAdventureItemScreen(player);
+            // Minecraft.getInstance().setScreen(new AdventureBookScreen(player));
             return InteractionResultHolder.success(item);
         }
 

@@ -31,9 +31,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class AdventureBookScreen extends Screen {
-    /**
-     *
-     */
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
@@ -206,11 +203,7 @@ public class AdventureBookScreen extends Screen {
         }
 
         Collections.sort(progress, (a, b) -> {
-            if (a.isMaxLevel() == b.isMaxLevel()) {
-                return a.enchantment.getFullname(0).toString().compareTo(b.enchantment.getFullname(0).toString());
-            }
-
-            return a.isMaxLevel() ? 1 : -1;
+            return a.enchantment.getFullname(0).toString().compareTo(b.enchantment.getFullname(0).toString());
         });
 
         int start = currentPage * nbItemsPerPage;
@@ -227,7 +220,11 @@ public class AdventureBookScreen extends Screen {
             } else {
                 Enchantment enchantment = (Enchantment) bonusEnchantments.keySet().toArray()[i - progress.size()];
                 this.renderItemName(graphics, y, enchantment);
-                this.renderBonusItemDescription(graphics, y, enchantment);
+                if (EnchantmentProgressManager.get(null).hasBonusEnchantment(player, enchantment)) {
+                    this.renderCompleteProgress(graphics, y - 5);
+                } else {
+                    this.renderBonusItemDescription(graphics, y, enchantment);
+                }
             }
 
         }
@@ -270,7 +267,7 @@ public class AdventureBookScreen extends Screen {
         List<Enchantment> requirements = EnchantmentUtils.getRequirementsForBonusEnchantment(enchantment);
 
         MutableComponent text = Component.empty();
-        Component delimiter = Component.literal(", ");
+        Component delimiter = Component.literal(" ");
 
         for (int i = 0; i < requirements.size(); i++) {
             Enchantment requiredEnchantment = requirements.get(i);
@@ -313,7 +310,7 @@ public class AdventureBookScreen extends Screen {
 
     public void renderProgress(@NotNull GuiGraphics graphics, int y, EnchantmentProgressSnapshot snapshot) {
         if (snapshot.isMaxLevel()) {
-            renderCompleteProgress(graphics, y, snapshot);
+            renderCompleteProgress(graphics, y);
             return;
         }
 
@@ -331,7 +328,7 @@ public class AdventureBookScreen extends Screen {
                 PROGRESS_SRC_X, PROGRESS_XP_SRC_Y, progressWidth, PROGRESS_HEIGHT);
     }
 
-    public void renderCompleteProgress(@NotNull GuiGraphics graphics, int y, EnchantmentProgressSnapshot snapshot) {
+    public void renderCompleteProgress(@NotNull GuiGraphics graphics, int y) {
         graphics.blit(TEXTURE, leftPos + WRITABLE_OFFSET_X + PROGRESS_OFFSET_X, y + PROGRESS_OFFSET_Y,
                 PROGRESS_SRC_X, PROGRESS_COMPLETE_SRC_Y, PROGRESS_WIDTH, PROGRESS_HEIGHT);
     }

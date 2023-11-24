@@ -38,15 +38,10 @@ public class EnchantmentManagerClientboundPacket {
     }
 
     public EnchantmentManagerClientboundPacket(FriendlyByteBuf buffer) {
-        System.out.println("Reading data from server");
         this.player = this.readUUID(buffer);
-        System.out.println("Player: " + player);
         this.playerData = this.readEnchantmentIntegerMap(buffer);
-        System.out.println("Player data: " + playerData);
         this.bonusClaimed = this.readEnchantmentIntegerMap(buffer);
-        System.out.println("Bonus claimed: " + bonusClaimed);
         this.progress = this.readEnchantmentProgressSnapshotList(buffer);
-        System.out.println("Progress: " + progress);
     }
 
     public void writeEnchantmentIntegerMap(FriendlyByteBuf buffer, Map<Enchantment, Integer> map) {

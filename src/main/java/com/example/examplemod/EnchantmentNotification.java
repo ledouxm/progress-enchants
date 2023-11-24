@@ -9,13 +9,14 @@ import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderGuiEvent;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 
-@Mod.EventBusSubscriber(modid = ExampleMod.MODID, bus = Bus.FORGE)
+@Mod.EventBusSubscriber(modid = ExampleMod.MODID, bus = Bus.FORGE, value = Dist.CLIENT)
 public class EnchantmentNotification {
 
     public static List<Component> queue = new ArrayList<Component>();
