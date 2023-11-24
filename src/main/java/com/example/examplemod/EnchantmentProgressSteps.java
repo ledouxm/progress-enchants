@@ -47,7 +47,7 @@ public class EnchantmentProgressSteps {
         steps.put(Enchantments.FIRE_ASPECT, new int[] { 5, 50 });
         steps.put(Enchantments.MOB_LOOTING, new int[] { 40, 100, 300 });
         steps.put(Enchantments.SWEEPING_EDGE, new int[] { 20, 50, 150 });
-        steps.put(Enchantments.BLOCK_EFFICIENCY, new int[] { 10, 20, 1000, 3000, 6000 });
+        steps.put(Enchantments.BLOCK_EFFICIENCY, new int[] { 100, 500, 1000, 3000, 6000 });
         steps.put(Enchantments.BLOCK_FORTUNE, new int[] { 150, 400, 800 });
         steps.put(Enchantments.LOYALTY, new int[] { 5, 20, 60 });
         steps.put(Enchantments.RIPTIDE, new int[] { 10, 50, 120 });
