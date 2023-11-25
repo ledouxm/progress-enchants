@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "progressiveenchantments:block/enchanting_bench"
+    }
+  }
+}

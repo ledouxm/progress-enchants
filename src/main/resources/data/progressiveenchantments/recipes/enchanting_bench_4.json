@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": ["PMC", "BBB", "WWW"],
+  "key": {
+    "C": {
+      "item": "minecraft:clock"
+    },
+    "P": {
+      "item": "minecraft:compass"
+    },
+    "M": {
+      "item": "minecraft:map"
+    },
+    "B": {
+      "item": "minecraft:book"
+    },
+    "W": {
+      "tag": "minecraft:planks"
+    }
+  },
+  "result": {
+    "item": "progressiveenchantments:enchanting_bench",
+    "count": 1
+  }
+}

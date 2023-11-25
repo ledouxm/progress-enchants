@@ -150,8 +150,8 @@ dependencies {
 
 mixin {
     // MixinGradle Settings
-    add sourceSets.main, 'mixins.examplemod.refmap.json'
-    config 'mixins.examplemod.json'
+    add sourceSets.main, 'mixins.progressiveenchantments.refmap.json'
+    config 'mixins.progressiveenchantments.json'
 
     debug.verbose = true
     debug.export = true
