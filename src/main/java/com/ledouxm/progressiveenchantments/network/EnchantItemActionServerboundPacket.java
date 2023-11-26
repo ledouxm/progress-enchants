@@ -4,15 +4,14 @@ import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 
-import com.ledouxm.progressiveenchantments.EnchantmentUtils;
 import com.ledouxm.progressiveenchantments.EnchantmentProgressManager.Status;
+import com.ledouxm.progressiveenchantments.EnchantmentUtils;
 import com.ledouxm.progressiveenchantments.block.EnchantingBenchMenu;
 import com.ledouxm.progressiveenchantments.block.PossibleEnchantment;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -57,9 +56,7 @@ public class EnchantItemActionServerboundPacket {
 
     public boolean handle(Supplier<NetworkEvent.Context> context) {
         context.get().enqueueWork(() -> {
-            LOGGER.info("ENQUEUED WORK");
             ServerPlayer player = context.get().getSender();
-            LOGGER.info(this.enchantment.toString());
 
             EnchantingBenchMenu menu = (EnchantingBenchMenu) player.containerMenu;
             menu.performEnchantment(enchantment, level, status, cost);

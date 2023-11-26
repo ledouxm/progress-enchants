@@ -1,22 +1,22 @@
 package com.ledouxm.progressiveenchantments.block;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 
 import com.ledouxm.progressiveenchantments.EnchantmentProgressManager;
-import com.ledouxm.progressiveenchantments.EnchantmentProgressSteps;
 import com.ledouxm.progressiveenchantments.EnchantmentProgressManager.Status;
+import com.ledouxm.progressiveenchantments.EnchantmentProgressSteps;
 import com.ledouxm.progressiveenchantments.init.ModBlocks;
 import com.ledouxm.progressiveenchantments.init.ModMenus;
 import com.ledouxm.progressiveenchantments.network.EnchantItemActionServerboundPacket;
 import com.ledouxm.progressiveenchantments.network.EnchantmentProgressChannel;
 import com.mojang.logging.LogUtils;
 
-import net.minecraft.client.gui.screens.inventory.EnchantmentScreen;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
@@ -26,11 +26,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.EnchantedBookItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.enchantment.DamageEnchantment;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class EnchantingBenchMenu extends AbstractContainerMenu {
@@ -108,25 +109,36 @@ public class EnchantingBenchMenu extends AbstractContainerMenu {
         }
     }
 
-    private void updatePossibleEnchantments(ItemStack item, Player player) {
+    public void setPossibleEnchantments(Player player, List<PossibleEnchantment> possibleEnchantments) {
+        this.possibleEnchantments = possibleEnchantments;
+    }
+
+    public void updatePossibleEnchantments(Player player) {
+        updatePossibleEnchantments(enchantSlot.getItem(0), player);
+    }
+
+    public void updatePossibleEnchantments(ItemStack item, Player player) {
         if (item == null || item.isEmpty()) {
             possibleEnchantments = null;
             return;
         }
-        List<Enchantment> possibleEnchantmentsForItem = EnchantmentProgressSteps.getPossibleEnchantmentsForItem(item);
-        this.possibleEnchantments = EnchantmentProgressManager.get(player.getServer())
-                .filterEnchantmentsListForPlayer(possibleEnchantmentsForItem, player);
-        LOGGER.info("Updating enchantments " + possibleEnchantments.get(0).enchantment + " "
-                + possibleEnchantments.get(1).enchantment);
 
+        EnchantmentProgressManager manager = EnchantmentProgressManager.get(player.getServer());
+
+        List<Enchantment> possibleEnchantmentsForItem = EnchantmentProgressSteps.getPossibleEnchantmentsForItem(item);
+        this.possibleEnchantments = manager.filterEnchantmentsListForPlayer(possibleEnchantmentsForItem, player, item);
+
+        if (player.level().isClientSide()) {
+            return;
+        }
+
+        manager.sendPossibleEnchantmentsToPlayer((ServerPlayer) player, possibleEnchantments);
     }
 
     @Override
     public boolean clickMenuButton(Player __, int index) {
-        LOGGER.info("Clicked menu button: " + index);
         PossibleEnchantment enchantment = possibleEnchantments.get(index);
 
-        System.out.println("click1 " + player);
         return this.clickMenuButton(player, enchantment);
     }
 
@@ -139,24 +151,20 @@ public class EnchantingBenchMenu extends AbstractContainerMenu {
         this.player = player;
         boolean isFree = enchantment.status == Status.FREE;
         boolean isLocked = enchantment.status == Status.LOCKED;
-        LOGGER.info("Possible enchantment: " + enchantment.enchantment + " " + enchantment.level + " "
-                + enchantment.status);
 
         if (!isFree && (isLocked || player.experienceLevel < enchantment.cost)) {
             return false;
         }
 
         ItemStack item = this.enchantSlot.getItem(0);
-        LOGGER.info("Item: " + item);
         if (item.isEmpty())
             return false;
 
-        boolean isBookAndEnchantable = item.getItem() == Items.BOOK && enchantment.enchantment.isAllowedOnBooks();
-        LOGGER.info("Item is not empty");
+        boolean isBookAndEnchantable = (item.getItem() == Items.BOOK || item.getItem() == Items.ENCHANTED_BOOK)
+                && enchantment.enchantment.isAllowedOnBooks();
         if (!(isBookAndEnchantable || enchantment.enchantment.canEnchant(item))) {
             return false;
         }
-        LOGGER.info("Item can be enchanted");
         for (Map.Entry<Enchantment, Integer> entry : EnchantmentHelper.getEnchantments(item).entrySet()) {
             Enchantment currentEnchantment = entry.getKey();
             if (!currentEnchantment.isCompatibleWith(enchantment.enchantment)) {
@@ -166,11 +174,9 @@ public class EnchantingBenchMenu extends AbstractContainerMenu {
 
         // this.enchantItem(item, enchantment.enchantment, enchantment.level);
 
-        if (player.level().isClientSide()) {
-            this.sendEnchantItemPacket(enchantment);
-        }
-
         this.performEnchantment(enchantment.enchantment, enchantment.level, enchantment.status, enchantment.cost);
+
+        this.enchantSlot.setChanged();
 
         return true;
     }
@@ -178,15 +184,20 @@ public class EnchantingBenchMenu extends AbstractContainerMenu {
     public void performEnchantment(Enchantment enchantment, int level, Status status, int cost) {
         boolean isFree = status == Status.FREE;
 
-        LOGGER.info("Enchanting item");
         ItemStack item = this.enchantSlot.getItem(0);
         if (item.is(Items.BOOK)) {
             item = new ItemStack(Items.ENCHANTED_BOOK);
             this.enchantSlot.setItem(0, item);
         }
-        item.enchant(enchantment, level);
-        // EnchantmentHelper.setEnchantments(Map.of(enchantment, level),
-        // enchantSlot.getItem(0));
+
+        if (item.is(Items.ENCHANTED_BOOK)) {
+            EnchantedBookItem.addEnchantment(item, new EnchantmentInstance(enchantment, level));
+        } else {
+            item.enchant(enchantment, level);
+        }
+
+        this.player.level().playSound(player, this.entity.getBlockPos(), SoundEvents.ENCHANTMENT_TABLE_USE,
+                SoundSource.BLOCKS);
 
         if (!isFree) {
             player.experienceLevel -= cost;
@@ -203,7 +214,15 @@ public class EnchantingBenchMenu extends AbstractContainerMenu {
     }
 
     public void onItemChange(ItemStack item, Player player) {
-        LOGGER.info(player == null ? "Player is null" : player.toString());
+        if (item == null || item.isEmpty()) {
+            possibleEnchantments = null;
+            return;
+        }
+
+        if (player.level().isClientSide()) {
+            return;
+        }
+
         updatePossibleEnchantments(item, player);
     }
 

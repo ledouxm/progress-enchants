@@ -105,6 +105,7 @@ public class ProgressiveEnchantments {
     public void onLoadPlayer(PlayerEvent.PlayerLoggedInEvent event) {
         Player player = event.getEntity();
         if (player instanceof ServerPlayer serverPlayer) {
+            EnchantmentProgressManager.get(player.getServer()).getAllPlayerProgress(serverPlayer);
             EnchantmentProgressManager.get(player.getServer()).sendDataToPlayer(serverPlayer);
         }
     }

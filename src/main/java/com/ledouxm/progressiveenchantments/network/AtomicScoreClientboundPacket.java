@@ -27,14 +27,12 @@ public class AtomicScoreClientboundPacket {
     public UUID player;
 
     public AtomicScoreClientboundPacket(UUID player, Enchantment enchantment, int score) {
-        LOGGER.info("AtomicScoreClientboundPacket: " + player + ", " + enchantment + ", " + score);
         this.player = player;
         this.enchantment = enchantment;
         this.score = score;
     }
 
     public AtomicScoreClientboundPacket(FriendlyByteBuf buffer) {
-        LOGGER.info("AtomicScoreClientboundPacket: " + buffer);
         this.player = buffer.readUUID();
         this.enchantment = this.readEnchantment(buffer);
         this.score = buffer.readInt();
@@ -57,8 +55,6 @@ public class AtomicScoreClientboundPacket {
     public boolean handle(Supplier<NetworkEvent.Context> context) {
         context.get().enqueueWork(() -> {
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-                LOGGER.info("AtomicScoreClientboundPacket.handle: " + this.player + ", " + this.enchantment + ", "
-                        + this.score);
                 EnchantmentProgressManager.get(null).setAtomicScore(this.player, this.enchantment, this.score);
             });
         });

@@ -1,10 +1,10 @@
 package com.ledouxm.progressiveenchantments.block;
 
 import com.ledouxm.progressiveenchantments.EnchantmentProgressManager;
+import com.ledouxm.progressiveenchantments.EnchantmentProgressManager.Status;
 import com.ledouxm.progressiveenchantments.EnchantmentProgressSnapshot;
 import com.ledouxm.progressiveenchantments.EnchantmentProgressSteps;
 import com.ledouxm.progressiveenchantments.EnchantmentUtils;
-import com.ledouxm.progressiveenchantments.EnchantmentProgressManager.Status;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
@@ -22,10 +22,19 @@ public class PossibleEnchantment {
     public PossibleEnchantment(Enchantment enchantment, int level, Player player) {
         this.enchantment = enchantment;
         this.level = level;
+        if (player == null)
+            return;
+
+        this.setPlayer(player);
+    }
+
+    public void setPlayer(Player player) {
         this.player = player;
-        this.snapshot = EnchantmentProgressManager.get(null).getEnchantmentProgressSnapshotForPlayer(player,
+
+        this.snapshot = EnchantmentProgressManager.get(player.getServer()).getEnchantmentProgressSnapshotForPlayer(
+                player,
                 enchantment, level);
-        this.status = EnchantmentProgressManager.get(null).getEnchantStatusForPlayer(player, enchantment,
+        this.status = EnchantmentProgressManager.get(player.getServer()).getEnchantStatusForPlayer(player, enchantment,
                 level);
         if (this.status == Status.UNLOCKED) {
             this.cost = EnchantmentProgressSteps.getCost(enchantment, level);
@@ -38,6 +47,10 @@ public class PossibleEnchantment {
 
     public PossibleEnchantment(FriendlyByteBuf buffer, Player player) {
         this(EnchantmentUtils.getEnchantmentById(buffer.readUtf()), buffer.readInt(), player);
+    }
+
+    public PossibleEnchantment(FriendlyByteBuf buffer) {
+        this(EnchantmentUtils.getEnchantmentById(buffer.readUtf()), buffer.readInt(), null);
     }
 
     public void write(FriendlyByteBuf buffer) {

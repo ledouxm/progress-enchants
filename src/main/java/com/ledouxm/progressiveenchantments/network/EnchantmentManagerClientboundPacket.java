@@ -1,9 +1,15 @@
 package com.ledouxm.progressiveenchantments.network;
 
-import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Supplier;
+
+import com.ledouxm.progressiveenchantments.EnchantmentProgressSnapshot;
+import com.ledouxm.progressiveenchantments.EnchantmentUtils;
+import com.ledouxm.progressiveenchantments.client.ClientModHandler;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -13,14 +19,6 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
-
-import com.ledouxm.progressiveenchantments.EnchantmentProgressManager;
-import com.ledouxm.progressiveenchantments.EnchantmentProgressSnapshot;
-import com.ledouxm.progressiveenchantments.EnchantmentUtils;
-
-import java.util.UUID;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class EnchantmentManagerClientboundPacket {
@@ -115,9 +113,7 @@ public class EnchantmentManagerClientboundPacket {
     public boolean handle(Supplier<NetworkEvent.Context> context) {
         context.get().enqueueWork(() -> {
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-                EnchantmentProgressManager.clientCopy.setPlayerData(player, playerData);
-                EnchantmentProgressManager.clientCopy.setBonusClaimed(player, bonusClaimed);
-                EnchantmentProgressManager.clientCopy.setProgress(player, progress);
+                ClientModHandler.onEnchantmentManagerPacket(this);
             });
         });
 

@@ -10,6 +10,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 
 public class EnchantmentProgressSteps {
@@ -29,38 +30,37 @@ public class EnchantmentProgressSteps {
     public static Map<Enchantment, int[]> steps = new HashMap<>();
     static {
         steps.put(Enchantments.UNBREAKING, new int[] { 1, 3, 6 });
-        steps.put(Enchantments.ALL_DAMAGE_PROTECTION, new int[] { 1, 75, 125, 250 });
-        steps.put(Enchantments.FIRE_PROTECTION, new int[] { 1, 60, 180, 300 });
-        steps.put(Enchantments.BLAST_PROTECTION, new int[] { 1, 10, 25, 50 });
-        steps.put(Enchantments.PROJECTILE_PROTECTION, new int[] { 1, 25, 60, 150 });
-        steps.put(Enchantments.THORNS, new int[] { 1, 25, 75 });
-        // TODO: fix this
-        steps.put(Enchantments.RESPIRATION, new int[] { 1, 1, 3 });
-        steps.put(Enchantments.AQUA_AFFINITY, new int[] { 1 });
-        steps.put(Enchantments.FALL_PROTECTION, new int[] { 1, 25, 50, 100 });
-        steps.put(Enchantments.DEPTH_STRIDER, new int[] { 1, 45, 90 });
-        steps.put(Enchantments.SOUL_SPEED, new int[] { 1, 50, 250 });
+        steps.put(Enchantments.ALL_DAMAGE_PROTECTION, new int[] { 25, 75, 125, 250 });
+        steps.put(Enchantments.FIRE_PROTECTION, new int[] { 10, 60, 180, 300 });
+        steps.put(Enchantments.BLAST_PROTECTION, new int[] { 3, 10, 25, 50 });
+        steps.put(Enchantments.PROJECTILE_PROTECTION, new int[] { 10, 25, 60, 150 });
+        steps.put(Enchantments.THORNS, new int[] { 5, 25, 75 });
+        steps.put(Enchantments.RESPIRATION, new int[] { 20, 60, 180 });
+        steps.put(Enchantments.AQUA_AFFINITY, new int[] { 32 });
+        steps.put(Enchantments.FALL_PROTECTION, new int[] { 10, 25, 50, 100 });
+        steps.put(Enchantments.DEPTH_STRIDER, new int[] { 15, 45, 90 });
+        steps.put(Enchantments.SOUL_SPEED, new int[] { 10, 50, 250 });
         steps.put(Enchantments.FROST_WALKER, new int[] { 1 });
-        steps.put(Enchantments.SWIFT_SNEAK, new int[] { 1, 250, 500 });
-        steps.put(Enchantments.SHARPNESS, new int[] { 1, 1000, 3000, 8000, 20000 });
-        steps.put(Enchantments.SMITE, new int[] { 1, 25, 50, 80, 120 });
-        steps.put(Enchantments.BANE_OF_ARTHROPODS, new int[] { 1, 15, 30, 50, 90 });
-        steps.put(Enchantments.KNOCKBACK, new int[] { 1, 15 });
-        steps.put(Enchantments.FIRE_ASPECT, new int[] { 1, 50 });
-        steps.put(Enchantments.MOB_LOOTING, new int[] { 1, 100, 300 });
-        steps.put(Enchantments.SWEEPING_EDGE, new int[] { 1, 50, 150 });
-        steps.put(Enchantments.BLOCK_EFFICIENCY, new int[] { 1, 500, 1000, 3000, 6000 });
-        steps.put(Enchantments.BLOCK_FORTUNE, new int[] { 1, 400, 800 });
-        steps.put(Enchantments.LOYALTY, new int[] { 1, 20, 60 });
-        steps.put(Enchantments.RIPTIDE, new int[] { 1, 50, 120 });
-        steps.put(Enchantments.IMPALING, new int[] { 1, 20, 50, 100, 200 });
-        steps.put(Enchantments.POWER_ARROWS, new int[] { 1, 20, 50, 80, 120 });
-        steps.put(Enchantments.PUNCH_ARROWS, new int[] { 1, 250 });
-        steps.put(Enchantments.PIERCING, new int[] { 1, 20, 50, 80, 120 });
-        steps.put(Enchantments.QUICK_CHARGE, new int[] { 1, 20, 50 });
-        steps.put(Enchantments.FLAMING_ARROWS, new int[] { 1 });
+        steps.put(Enchantments.SWIFT_SNEAK, new int[] { 50, 250, 500 });
+        steps.put(Enchantments.SHARPNESS, new int[] { 300, 1000, 3000, 8000, 20000 });
+        steps.put(Enchantments.SMITE, new int[] { 10, 25, 50, 80, 120 });
+        steps.put(Enchantments.BANE_OF_ARTHROPODS, new int[] { 7, 15, 30, 50, 90 });
+        steps.put(Enchantments.KNOCKBACK, new int[] { 3, 15 });
+        steps.put(Enchantments.FIRE_ASPECT, new int[] { 5, 50 });
+        steps.put(Enchantments.MOB_LOOTING, new int[] { 40, 100, 300 });
+        steps.put(Enchantments.SWEEPING_EDGE, new int[] { 20, 50, 150 });
+        steps.put(Enchantments.BLOCK_EFFICIENCY, new int[] { 100, 500, 1000, 3000, 6000 });
+        steps.put(Enchantments.BLOCK_FORTUNE, new int[] { 150, 400, 800 });
+        steps.put(Enchantments.LOYALTY, new int[] { 5, 20, 60 });
+        steps.put(Enchantments.RIPTIDE, new int[] { 10, 50, 120 });
+        steps.put(Enchantments.IMPALING, new int[] { 8, 20, 50, 100, 200 });
+        steps.put(Enchantments.POWER_ARROWS, new int[] { 5, 20, 50, 80, 120 });
+        steps.put(Enchantments.PUNCH_ARROWS, new int[] { 100, 250 });
+        steps.put(Enchantments.PIERCING, new int[] { 5, 20, 50, 80, 120 });
+        steps.put(Enchantments.QUICK_CHARGE, new int[] { 5, 20, 50 });
+        steps.put(Enchantments.FLAMING_ARROWS, new int[] { 32 });
         steps.put(Enchantments.FISHING_LUCK, new int[] { 1, 3, 6 });
-        steps.put(Enchantments.FISHING_SPEED, new int[] { 1, 15, 30 });
+        steps.put(Enchantments.FISHING_SPEED, new int[] { 5, 15, 30 });
     }
 
     public static int getCost(Enchantment enchantment, int level) {
@@ -139,6 +139,22 @@ public class EnchantmentProgressSteps {
         return getPossibleEnchantmentsForItem(itemStack).size() > 0;
     }
 
+    // public static PossibleEnchantment canEnchant(Player player, Enchantment
+    // enchantment, int level, ItemStack item) {
+    // // EnchantmentHelper
+    // EnchantmentScreen
+    // boolean isBook = item.getItem() == Items.BOOK || item.getItem() ==
+    // Items.ENCHANTED_BOOK;
+
+    // if (isBook && !enchantment.isAllowedOnBooks()) {
+    // return null;
+    // }
+
+    // if (!enchantment.canEnchant(item)) {
+    // return null;
+    // }
+    // }
+
     public static List<Enchantment> getPossibleEnchantmentsForItem(ItemStack itemStack) {
         List<Enchantment> possibleEnchantments = new ArrayList<Enchantment>();
 
@@ -146,18 +162,34 @@ public class EnchantmentProgressSteps {
         boolean isBook = item == Items.BOOK || item == Items.ENCHANTED_BOOK;
 
         for (Enchantment enchantment : EnchantmentProgressSteps.steps.keySet()) {
-            if ((isBook && enchantment.isAllowedOnBooks()) || enchantment.canEnchant(itemStack)) {
+            if (((isBook && enchantment.isAllowedOnBooks()) || enchantment.canEnchant(itemStack))) {
                 possibleEnchantments.add(enchantment);
             }
         }
 
         for (Enchantment enchantment : EnchantmentProgressSteps.bonusEnchantments) {
-            if ((isBook && enchantment.isAllowedOnBooks()) || enchantment.canEnchant(itemStack)) {
+            if (((isBook && enchantment.isAllowedOnBooks()) || enchantment.canEnchant(itemStack))) {
                 possibleEnchantments.add(enchantment);
             }
         }
 
         return possibleEnchantments;
+    }
+
+    public static boolean alreadyHasMaxEnchantment(ItemStack itemStack, Enchantment enchantment) {
+        int maxLevel = enchantment.getMaxLevel();
+
+        return alreadyHasEnchantmentOrHighter(itemStack, enchantment, maxLevel);
+    }
+
+    public static boolean alreadyHasEnchantmentOrHighter(ItemStack itemStack, Enchantment enchantment, int level) {
+        Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(itemStack);
+
+        if (enchantments.containsKey(enchantment)) {
+            return enchantments.get(enchantment) >= level;
+        }
+
+        return false;
     }
 
     public static Map<Enchantment, Boolean> getBonusEnchantmentsAvailability(Player player) {
