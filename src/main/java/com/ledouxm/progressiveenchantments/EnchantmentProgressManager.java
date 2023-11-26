@@ -445,5 +445,15 @@ public class EnchantmentProgressManager extends SavedData {
             this.name = name;
             this.color = color;
         }
+
+        public static Status getByName(String name) {
+            for (Status status : Status.values()) {
+                if (status.name.equals(name)) {
+                    return status;
+                }
+            }
+
+            return null;
+        }
     }
 }

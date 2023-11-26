@@ -3,8 +3,10 @@ package com.ledouxm.progressiveenchantments.block;
 import com.ledouxm.progressiveenchantments.EnchantmentProgressManager;
 import com.ledouxm.progressiveenchantments.EnchantmentProgressSnapshot;
 import com.ledouxm.progressiveenchantments.EnchantmentProgressSteps;
+import com.ledouxm.progressiveenchantments.EnchantmentUtils;
 import com.ledouxm.progressiveenchantments.EnchantmentProgressManager.Status;
 
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.enchantment.Enchantment;
 
@@ -32,6 +34,15 @@ public class PossibleEnchantment {
         }
         this.canBuy = (this.status == Status.FREE)
                 || (this.status == Status.UNLOCKED && this.player.experienceLevel >= this.cost);
+    }
+
+    public PossibleEnchantment(FriendlyByteBuf buffer, Player player) {
+        this(EnchantmentUtils.getEnchantmentById(buffer.readUtf()), buffer.readInt(), player);
+    }
+
+    public void write(FriendlyByteBuf buffer) {
+        buffer.writeUtf(EnchantmentUtils.getEnchantmentId(this.enchantment));
+        buffer.writeInt(this.level);
     }
 
     @Override

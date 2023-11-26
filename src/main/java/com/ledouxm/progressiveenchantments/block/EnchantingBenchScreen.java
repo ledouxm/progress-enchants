@@ -6,6 +6,8 @@ import org.jetbrains.annotations.NotNull;
 
 import com.ledouxm.progressiveenchantments.ProgressiveEnchantments;
 import com.ledouxm.progressiveenchantments.EnchantmentProgressManager.Status;
+import com.ledouxm.progressiveenchantments.network.EnchantItemActionServerboundPacket;
+import com.ledouxm.progressiveenchantments.network.EnchantmentProgressChannel;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -138,7 +140,6 @@ public class EnchantingBenchScreen extends AbstractContainerScreen<EnchantingBen
         }
 
         if (this.menu.clickMenuButton(null, enchantmentIndex)) {
-            this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, enchantmentIndex);
             return true;
 
         }

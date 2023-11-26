@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    { "item": "minecraft:book" },
+    { "item": "minecraft:raw_cod" },
+    { "item": "minecraft:gunpowder" },
+    { "item": "minecraft:iron_ingot" }
+  ],
+  "result": {
+    "item": "progressiveenchantments:adventure_book",
+    "count": 1
+  }
+}
